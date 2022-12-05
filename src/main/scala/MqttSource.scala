@@ -8,10 +8,9 @@ import akka.stream.scaladsl.Source
 import akka.util.ByteString
 import com.typesafe.scalalogging.LazyLogging
 
-class MqttSource(mqttSettings: MqttSettings, numParallelFutures: Int = 1)(implicit
-    system: ActorSystem[_]
-) extends LazyLogging {
+class MqttSource(mqttSettings: MqttSettings)(implicit system: ActorSystem[_]) extends LazyLogging {
   val mqttClient: MqttClient = new MqttClient(mqttSettings)
+  val numParallelFutures: Int = 1
   val flow: Source[(ByteString, String), NotUsed] = Source
     .repeat(NotUsed)
     .map(_ => mqttClient.eventQueue.pull())
