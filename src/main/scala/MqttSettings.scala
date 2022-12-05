@@ -3,6 +3,7 @@ package pl.waw.ibspan.scala_mqtt_wrapper
 import utils.Uuid.generateUuid
 
 import akka.util.ByteString
+import akka.stream.alpakka.mqtt.streaming.ConnectFlags
 
 final case class MqttSettings(
     username: String,
@@ -10,5 +11,6 @@ final case class MqttSettings(
     host: String,
     port: Int,
     topics: Seq[MqttTopic],
-    sessionId: ByteString = ByteString(generateUuid.toString)
+    sessionId: ByteString = ByteString(generateUuid.toString),
+    connectFlags: ConnectFlags = ConnectFlags.CleanSession
 )
