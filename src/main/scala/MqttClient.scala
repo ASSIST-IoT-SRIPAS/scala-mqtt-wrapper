@@ -21,9 +21,12 @@ import com.typesafe.scalalogging.LazyLogging
 
 import scala.concurrent.Future
 
-class MqttClient(mqttSettings: MqttSettings)(implicit system: ActorSystem[_]) extends LazyLogging {
-  val settings: MqttSessionSettings = MqttSessionSettings()
-  val session: ActorMqttClientSession = ActorMqttClientSession(settings)
+class MqttClient(
+    mqttSettings: MqttSettings,
+    mqttSessionSettings: MqttSessionSettings = MqttSessionSettings()
+)(implicit system: ActorSystem[_])
+    extends LazyLogging {
+  val session: ActorMqttClientSession = ActorMqttClientSession(mqttSessionSettings)
   val tcpConnection: Flow[ByteString, ByteString, Future[Tcp.OutgoingConnection]] =
     Tcp(system).outgoingConnection(mqttSettings.host, mqttSettings.port)
   val sessionFlow: Flow[Command[Nothing], Either[MqttCodec.DecodeError, Event[Nothing]], NotUsed] =
