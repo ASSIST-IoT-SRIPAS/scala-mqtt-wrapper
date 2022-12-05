@@ -2,7 +2,6 @@ package pl.waw.ibspan.scala_mqtt_wrapper
 
 import akka.NotUsed
 import akka.actor.typed.ActorSystem
-import akka.event.Logging
 import akka.stream.RestartSettings
 import akka.stream.alpakka.mqtt.streaming.Command
 import akka.stream.alpakka.mqtt.streaming.Connect
