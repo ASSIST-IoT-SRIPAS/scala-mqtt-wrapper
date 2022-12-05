@@ -29,7 +29,7 @@ class MqttClient(mqttSettings: MqttSettings)(implicit system: ActorSystem[_]) {
     Command[Nothing](
       Connect(
         mqttSettings.clientId,
-        extraConnectFlags = ConnectFlags.CleanSession,
+        extraConnectFlags = mqttSettings.connectFlags,
         username = mqttSettings.username,
         password = mqttSettings.password
       )
