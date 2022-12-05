@@ -11,6 +11,7 @@ final case class MqttSettings(
     host: String,
     port: Int,
     topics: Seq[MqttTopic],
+    clientId: String = generateUuid.toString,
     sessionId: ByteString = ByteString(generateUuid.toString),
     connectFlags: ConnectFlags = ConnectFlags.CleanSession
 )
