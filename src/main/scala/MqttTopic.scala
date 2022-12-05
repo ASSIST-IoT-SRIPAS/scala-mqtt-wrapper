@@ -4,5 +4,5 @@ import akka.stream.alpakka.mqtt.streaming.ControlPacketFlags
 
 final case class MqttTopic(
     name: String,
-    controlPacketFlags: Seq[ControlPacketFlags]
+    controlPacketFlags: ControlPacketFlags
 )
