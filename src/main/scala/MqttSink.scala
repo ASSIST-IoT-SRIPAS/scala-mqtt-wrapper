@@ -9,19 +9,17 @@ import akka.stream.scaladsl.Flow
 import akka.stream.scaladsl.Keep
 import akka.stream.scaladsl.Sink
 import akka.util.ByteString
+import com.typesafe.scalalogging.LazyLogging
 
-class MqttSink(mqttSettings: MqttSettings)(implicit system: ActorSystem[_]) {
+class MqttSink(mqttSettings: MqttSettings)(implicit system: ActorSystem[_]) extends LazyLogging {
   val mqttClient: MqttClient = new MqttClient(mqttSettings)
   val flow: Sink[(ByteString, String, ControlPacketFlags), NotUsed] =
     Flow[(ByteString, String, ControlPacketFlags)]
-      .collect { case (msg, topic, publishFlags) =>
-        publish(msg, topic, publishFlags)
+      .wireTap(data =>
+        logger.debug(s"Sending message [${data._1.utf8String}] to topic [${data._2}]")
+      )
+      .map { case (msg, topic, publishFlags) =>
+        mqttClient.session ! Command[Nothing](Publish(publishFlags, topic, msg))
       }
-      .concatMat(mqttClient.flow)(Keep.none)
       .to(Sink.ignore)
-
-  def publish(msg: ByteString, topic: String, publishFlags: ControlPacketFlags): Unit = {
-    val command = Command[Nothing](Publish(publishFlags, topic, msg))
-    mqttClient.session ! command
-  }
 }
