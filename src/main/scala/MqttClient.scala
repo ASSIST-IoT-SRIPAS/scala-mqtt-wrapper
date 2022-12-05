@@ -4,7 +4,6 @@ import akka.NotUsed
 import akka.actor.typed.ActorSystem
 import akka.stream.alpakka.mqtt.streaming.Command
 import akka.stream.alpakka.mqtt.streaming.Connect
-import akka.stream.alpakka.mqtt.streaming.ConnectFlags
 import akka.stream.alpakka.mqtt.streaming.Event
 import akka.stream.alpakka.mqtt.streaming.MqttCodec
 import akka.stream.alpakka.mqtt.streaming.MqttSessionSettings
