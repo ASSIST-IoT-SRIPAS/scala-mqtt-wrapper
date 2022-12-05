@@ -48,14 +48,5 @@ object Main {
       })
       .to(sink.flow)
       .run()
-//    Source(
-//      List(
-//        (
-//          ByteString("halo"),
-//          "test",
-//          ControlPacketFlags.QoSAtLeastOnceDelivery | ControlPacketFlags.RETAIN
-//        )
-//      )
-//    ).to(sink.flow).run()
   }
 }
