@@ -24,10 +24,10 @@ class MqttClient(mqttSettings: MqttSettings)(implicit system: ActorSystem[_]) {
     Mqtt
       .clientSessionFlow(session, mqttSettings.sessionId)
       .join(tcpConnection)
-  val connection: Command[Nothing] =
+  val connectCommand: Command[Nothing] =
     Command[Nothing](
       Connect(
-        mqttSettings.clientId,
+        clientId = mqttSettings.clientId,
         extraConnectFlags = mqttSettings.connectFlags,
         username = mqttSettings.username,
         password = mqttSettings.password
