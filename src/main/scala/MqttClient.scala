@@ -14,9 +14,7 @@ import akka.stream.alpakka.mqtt.streaming.scaladsl.Mqtt
 import akka.stream.scaladsl.Flow
 import akka.stream.scaladsl.Keep
 import akka.stream.scaladsl.Sink
-import akka.stream.scaladsl.SinkQueueWithCancel
 import akka.stream.scaladsl.Source
-import akka.stream.scaladsl.SourceQueueWithComplete
 import akka.stream.scaladsl.Tcp
 import akka.util.ByteString
 import com.typesafe.scalalogging.LazyLogging
@@ -54,11 +52,4 @@ class MqttClient(mqttSettings: MqttSettings)(implicit system: ActorSystem[_]) ex
   for (command <- initialCommands) {
     commandQueue.offer(command)
   }
-
-//  import akka.stream.alpakka.mqtt.streaming.Publish
-//  import scala.concurrent.ExecutionContext
-//  import ExecutionContext.Implicits.global
-//  val f = commandQueue.offer(Command[Nothing](Publish("input", ByteString("a"))))
-//  f.onComplete(_ => println("DONE"))
-//  session ! Command[Nothing](Publish("input", ByteString("a")))
 }
