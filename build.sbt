@@ -20,6 +20,7 @@ Global / excludeLintKeys += idePackagePrefix
 
 lazy val akkaVersion = "2.6.19" // 2.7.x changes license to BSL v1.1
 lazy val akkaMqttVersion = "4.0.0" // 5.x changes license to BSL v1.1
+lazy val logbackVersion = "1.4.5"
 lazy val scalaLoggingVersion = "3.9.5"
 lazy val scalaTestVersion = "3.2.14"
 lazy val scalaTestPlusScalaCheck = "3.2.14.0"
@@ -31,6 +32,7 @@ lazy val root = (project in file("."))
     libraryDependencies ++= Seq(
       "com.typesafe.akka" %% "akka-actor-typed" % akkaVersion,
       "com.lightbend.akka" %% "akka-stream-alpakka-mqtt-streaming" % akkaMqttVersion,
+      "ch.qos.logback" % "logback-classic" % logbackVersion,
       "com.typesafe.scala-logging" %% "scala-logging" % scalaLoggingVersion,
       "org.scalatest" %% "scalatest" % scalaTestVersion % Test,
       "com.typesafe.akka" %% "akka-actor-testkit-typed" % akkaVersion % Test,
