@@ -13,8 +13,8 @@ services:
     networks:
       - smw-app-mosquitto-net
     volumes:
-      - app-ivy2-data:/root/.ivy2
-      - app-sbt-data:/root/.sbt
+      - swm-app-ivy2-data:/root/.ivy2
+      - swm-app-sbt-data:/root/.sbt
       - ../../src:/app/src
 
   mosquitto:
@@ -36,13 +36,13 @@ services:
     ports:
       - "4000:4000"
     volumes:
-      - mqtt-explorer-data:/mqtt-explorer/config
+      - swm-mqtt-explorer-data:/mqtt-explorer/config
 
 networks:
   smw-app-mosquitto-net:
   swm-mosquitto-explorer-net:
 
 volumes:
-  app-ivy2-data:
-  app-sbt-data:
-  mqtt-explorer-data:
+  swm-app-ivy2-data:
+  swm-app-sbt-data:
+  swm-mqtt-explorer-data:
