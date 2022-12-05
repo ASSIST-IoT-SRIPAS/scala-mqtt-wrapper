@@ -22,16 +22,14 @@ class MqttClient(mqttSettings: MqttSettings)(implicit system: ActorSystem[_]) {
   val session: ActorMqttClientSession = ActorMqttClientSession(settings)
   val tcpConnection: Flow[ByteString, ByteString, Future[Tcp.OutgoingConnection]] =
     Tcp(system).outgoingConnection(mqttSettings.host, mqttSettings.port)
-  val sessionId: ByteString = ByteString(generateUuid.toString)
   val flow: Flow[Command[Nothing], Either[MqttCodec.DecodeError, Event[Nothing]], NotUsed] =
     Mqtt
-      .clientSessionFlow(session, sessionId)
+      .clientSessionFlow(session, mqttSettings.sessionId)
       .join(tcpConnection)
-  val clientId: String = generateUuid.toString
   val connection: Command[Nothing] =
     Command[Nothing](
       Connect(
-        clientId,
+        mqttSettings.clientId,
         extraConnectFlags = ConnectFlags.CleanSession,
         username = mqttSettings.username.getOrElse(""),
         password = mqttSettings.password.getOrElse("")
