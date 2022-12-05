@@ -14,7 +14,6 @@ import akka.stream.scaladsl.Flow
 import akka.stream.scaladsl.Tcp
 import akka.util.ByteString
 
-
 import scala.concurrent.Future
 
 class MqttClient(mqttSettings: MqttSettings)(implicit system: ActorSystem[_]) {
@@ -31,8 +30,8 @@ class MqttClient(mqttSettings: MqttSettings)(implicit system: ActorSystem[_]) {
       Connect(
         mqttSettings.clientId,
         extraConnectFlags = ConnectFlags.CleanSession,
-        username = mqttSettings.username.getOrElse(""),
-        password = mqttSettings.password.getOrElse("")
+        username = mqttSettings.username,
+        password = mqttSettings.password
       )
     )
 }
