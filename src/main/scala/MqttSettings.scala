@@ -6,11 +6,11 @@ import akka.util.ByteString
 import utils.Uuid.generateUuid
 
 final case class MqttSettings(
-    username: String,
-    password: String,
     host: String,
     port: Int,
-    topics: Seq[MqttTopic],
+    username: String = "",
+    password: String = "",
+    topics: Seq[MqttTopic] = Seq.empty[MqttTopic],
     clientId: String = generateUuid.toString,
     sessionId: ByteString = ByteString(generateUuid.toString),
     connectFlags: ConnectFlags = ConnectFlags.CleanSession
