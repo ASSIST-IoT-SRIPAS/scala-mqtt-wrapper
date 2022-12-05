@@ -27,6 +27,8 @@ ENV SCALA_HOME="$SDKMAN_DIR/candidates/scala/current"
 ENV SBT_HOME="$SDKMAN_DIR/candidates/sbt/current"
 ENV JAVA_HOME="$SDKMAN_DIR/candidates/java/current"
 ENV PATH="$SCALA_HOME/bin:$SBT_HOME/bin:$JAVA_HOME/bin:$PATH"
+
+FROM base AS dev
 WORKDIR /app
 COPY ./dev/app/entrypoint.sh ./entrypoint.sh
 COPY ./project/build.properties ./project/build.properties
