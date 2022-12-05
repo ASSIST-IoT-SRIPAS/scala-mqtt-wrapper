@@ -15,6 +15,8 @@ object Main {
     import akka.stream.scaladsl.Source
     import akka.stream.alpakka.mqtt.streaming.Command
     import akka.stream.alpakka.mqtt.streaming.Publish
+    import akka.stream.KillSwitches
+    import akka.stream.scaladsl.Keep
 
     implicit val system: ActorSystem[Nothing] = ActorSystem[Nothing](
       Behaviors.setup[Nothing] { context =>
@@ -36,7 +38,8 @@ object Main {
         port = 1883
       )
     )
-    source.flow
+    val stream = source.flow
+      .viaMat(KillSwitches.single)(Keep.right)
       .via(Flow[(ByteString, String)].map { case (msg, topic) =>
         val outputMsg = ByteString(msg.utf8String.toUpperCase)
         val outputTopic = "output"
@@ -48,5 +51,8 @@ object Main {
       })
       .to(sink.flow)
       .run()
+    Thread.sleep(10000)
+    stream.shutdown()
+    println("Done")
   }
 }
