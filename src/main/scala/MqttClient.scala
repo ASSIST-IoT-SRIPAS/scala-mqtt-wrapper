@@ -13,8 +13,8 @@ import akka.stream.alpakka.mqtt.streaming.scaladsl.ActorMqttClientSession
 import akka.stream.alpakka.mqtt.streaming.scaladsl.Mqtt
 import akka.stream.scaladsl.Flow
 import akka.stream.scaladsl.Keep
+import akka.stream.scaladsl.Sink
 import akka.stream.scaladsl.Source
-import akka.stream.scaladsl.SourceQueueWithComplete
 import akka.stream.scaladsl.Tcp
 import akka.util.ByteString
 import com.typesafe.scalalogging.LazyLogging
@@ -42,12 +42,14 @@ class MqttClient(mqttSettings: MqttSettings)(implicit system: ActorSystem[_]) ex
   val subscribeCommands: List[Command[Nothing]] =
     mqttSettings.topics.map(topic => Command[Nothing](Subscribe(topic.name))).toList
   val initialCommands: List[Command[Nothing]] = connectCommand :: subscribeCommands
-
-  val bufferSize: Int = 100
-  val flow
-      : Source[Either[MqttCodec.DecodeError, Event[Nothing]], SourceQueueWithComplete[Nothing]] =
-    Source(initialCommands)
-      .concatMat(Source.queue(bufferSize, OverflowStrategy.backpressure))(Keep.right)
-      .via(sessionFlow)
-      .wireTap(event => logger.debug(s"Received event: $event"))
+  val commandQueueBufferSize: Int = 100
+  val (commandQueue, eventQueue) = Source
+    .queue(commandQueueBufferSize, OverflowStrategy.backpressure)
+    .via(sessionFlow)
+    .wireTap(event => logger.debug(s"Received output event $event"))
+    .toMat(Sink.queue())(Keep.both)
+    .run()
+  for (command <- initialCommands) {
+    commandQueue.offer(command)
+  }
 }

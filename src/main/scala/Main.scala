@@ -11,6 +11,10 @@ object Main {
     import akka.stream.scaladsl.Flow
     import akka.util.ByteString
     import akka.stream.alpakka.mqtt.streaming.ControlPacketFlags
+    import akka.stream.scaladsl.Sink
+    import akka.stream.scaladsl.Source
+    import akka.stream.alpakka.mqtt.streaming.Command
+    import akka.stream.alpakka.mqtt.streaming.Publish
 
     implicit val system: ActorSystem[Nothing] = ActorSystem[Nothing](
       Behaviors.setup[Nothing] { context =>
