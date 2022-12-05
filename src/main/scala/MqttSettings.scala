@@ -1,9 +1,9 @@
 package pl.waw.ibspan.scala_mqtt_wrapper
 
-import utils.Uuid.generateUuid
-
-import akka.util.ByteString
 import akka.stream.alpakka.mqtt.streaming.ConnectFlags
+import akka.util.ByteString
+
+import utils.Uuid.generateUuid
 
 final case class MqttSettings(
     username: String,
