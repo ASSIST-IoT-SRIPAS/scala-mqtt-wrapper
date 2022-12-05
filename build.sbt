@@ -18,7 +18,7 @@ ThisBuild / fork := true
 
 Global / excludeLintKeys += idePackagePrefix
 
-lazy val akkaVersion = "2.6.20" // 2.7.x changes license to BSL v1.1
+lazy val akkaVersion = "2.6.19" // 2.7.x changes license to BSL v1.1
 lazy val akkaMqttVersion = "4.0.0" // 5.x changes license to BSL v1.1
 lazy val scalaLoggingVersion = "3.9.5"
 lazy val scalaTestVersion = "3.2.14"
