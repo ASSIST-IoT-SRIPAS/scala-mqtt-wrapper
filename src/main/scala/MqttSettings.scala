@@ -1,5 +1,6 @@
 package pl.waw.ibspan.scala_mqtt_wrapper
 
+import akka.event.Logging
 import akka.stream.alpakka.mqtt.streaming.ConnectFlags
 import akka.util.ByteString
 
@@ -20,5 +21,6 @@ final case class MqttSettings(
     restartMinBackoff: FiniteDuration = 1.seconds,
     restartMaxBackoff: FiniteDuration = 30.seconds,
     restartRandomFactor: Double = 0.2,
-    maxRestarts: Int = -1
+    maxRestarts: Int = -1,
+    restartLogLevel: Logging.LogLevel = Logging.WarningLevel
 )

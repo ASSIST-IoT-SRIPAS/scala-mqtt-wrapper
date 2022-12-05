@@ -2,6 +2,7 @@ package pl.waw.ibspan.scala_mqtt_wrapper
 
 import akka.NotUsed
 import akka.actor.typed.ActorSystem
+import akka.event.Logging
 import akka.stream.RestartSettings
 import akka.stream.alpakka.mqtt.streaming.Command
 import akka.stream.alpakka.mqtt.streaming.Connect
@@ -49,7 +50,9 @@ class MqttClient(
     minBackoff = mqttSettings.restartMinBackoff,
     maxBackoff = mqttSettings.restartMaxBackoff,
     randomFactor = mqttSettings.restartRandomFactor
-  ).withMaxRestarts(mqttSettings.maxRestarts, mqttSettings.restartMinBackoff)
+  )
+    .withMaxRestarts(mqttSettings.maxRestarts, mqttSettings.restartMinBackoff)
+    .withLogSettings(RestartSettings.createLogSettings(logLevel = mqttSettings.restartLogLevel))
   val source: Source[Either[MqttCodec.DecodeError, Event[Nothing]], NotUsed] =
     RestartSource.withBackoff(restartingSourceSettings) { () =>
       Source(initialCommands)
