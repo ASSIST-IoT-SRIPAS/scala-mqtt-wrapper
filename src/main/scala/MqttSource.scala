@@ -10,13 +10,8 @@ import com.typesafe.scalalogging.LazyLogging
 
 class MqttSource(mqttSettings: MqttSettings)(implicit system: ActorSystem[_]) extends LazyLogging {
   val mqttClient: MqttClient = new MqttClient(mqttSettings)
-  val numParallelFutures: Int = 1
-  val flow: Source[(ByteString, String), NotUsed] = Source
-    .repeat(NotUsed)
-    .map(_ => mqttClient.eventQueue.pull())
-    .mapAsync(numParallelFutures)(identity)
-    .wireTap(event => logger.debug(s"Received input event $event"))
-    .collect { case Some(Right(Event(p: Publish, _))) =>
+  val flow: Source[(ByteString, String), NotUsed] = mqttClient.source
+    .collect { case Right(Event(p: Publish, _)) =>
       (p.payload, p.topicName)
     }
 }

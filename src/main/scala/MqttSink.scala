@@ -12,6 +12,7 @@ import com.typesafe.scalalogging.LazyLogging
 
 class MqttSink(mqttSettings: MqttSettings)(implicit system: ActorSystem[_]) extends LazyLogging {
   val mqttClient: MqttClient = new MqttClient(mqttSettings)
+  mqttClient.source.runWith(Sink.ignore)
   val flow: Sink[(ByteString, String, ControlPacketFlags), NotUsed] =
     Flow[(ByteString, String, ControlPacketFlags)]
       .wireTap(data =>
