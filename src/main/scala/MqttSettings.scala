@@ -23,5 +23,6 @@ final case class MqttSettings(
     restartRandomFactor: Double = 0.2,
     maxRestarts: Int = -1,
     restartLogLevel: Logging.LogLevel = Logging.WarningLevel,
-    broadcastHubBufferSize: Int = 128
+    commandsBroadcastBufferSize: Int = 128,
+    eventsBroadcastBufferSize: Int = 128
 )

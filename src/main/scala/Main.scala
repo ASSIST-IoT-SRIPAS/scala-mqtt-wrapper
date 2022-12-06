@@ -18,6 +18,7 @@ object Main {
     import akka.stream.KillSwitches
     import akka.stream.scaladsl.Keep
     import scala.concurrent.ExecutionContextExecutor
+    import akka.stream.alpakka.mqtt.streaming.Subscribe
 
     implicit val system: ActorSystem[Nothing] = ActorSystem[Nothing](
       Behaviors.setup[Nothing] { context =>
@@ -60,6 +61,8 @@ object Main {
     source
       .via(uppercaseFlow)
       .runWith(sink)
+
+    sourceClient.commands.offer(Command[Nothing](Subscribe("test")))
 
     Thread.sleep(60000)
     sourceClient.shutdown()

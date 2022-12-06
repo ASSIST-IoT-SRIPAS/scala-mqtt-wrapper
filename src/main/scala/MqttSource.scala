@@ -11,7 +11,7 @@ import com.typesafe.scalalogging.LazyLogging
 object MqttSource extends LazyLogging {
   def source(mqttClient: MqttClient)(implicit
       system: ActorSystem[_]
-  ): Source[(ByteString, String), NotUsed] = mqttClient.sourceBroadcast
+  ): Source[(ByteString, String), NotUsed] = mqttClient.eventsBroadcast
     .collect { case Right(Event(p: Publish, _)) =>
       (p.payload, p.topicName)
     }
