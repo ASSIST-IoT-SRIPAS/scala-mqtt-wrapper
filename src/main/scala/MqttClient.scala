@@ -72,8 +72,8 @@ class MqttClient(
   val initialCommands: List[Command[Nothing]] = connectCommand :: subscribeCommands
 
   // create a queue `commands` that accepts client commands
+  // the commands sent to the queue are not persisted between restarts
   // `commandsBroadcast` broadcasts the queue commands
-  // `bufferSize` should not be smaller than the number of initial commands
   val (commands, commandsBroadcast) = Source
     .queue[Command[Nothing]](
       bufferSize = mqttSettings.commandsBroadcastBufferSize,
@@ -94,25 +94,13 @@ class MqttClient(
     .withMaxRestarts(mqttSettings.maxRestarts, mqttSettings.restartMinBackoff)
     .withLogSettings(RestartSettings.createLogSettings(logLevel = mqttSettings.restartLogLevel))
   // create the MQTT source that restarts on failure
-  // the initial commands are sent to the command queue
-  // then their broadcast is connected to the MQTT session flow
+  // first, the initial commands are sent to the broker
+  // then the command broadcast is connected to the MQTT session flow
   // the MQTT session flow produces MQTT events
   val restartingEventsSource: Source[Either[MqttCodec.DecodeError, Event[Nothing]], NotUsed] =
     RestartSource.withBackoff(restartingEventsSourceSettings) { () =>
-      for (command <- initialCommands) {
-        val queueResult = commands.offer(command)
-        queueResult.map {
-          case QueueOfferResult.Enqueued =>
-            logger.debug(s"[$name] Command [$command] enqueued")
-          case QueueOfferResult.Dropped =>
-            logger.warn(s"[$name] Command [$command] dropped")
-          case QueueOfferResult.Failure(exception) =>
-            logger.error(s"[$name] Command [$command] failed [$exception]")
-          case QueueOfferResult.QueueClosed =>
-            logger.warn(s"[$name] Command [$command] queue closed")
-        }(system.executionContext)
-      }
-      commandsBroadcast
+      Source(initialCommands)
+        .concatMat(commandsBroadcast)(Keep.right)
         .via(sessionFlow)
         .wireTap(event => logger.debug(s"[$name] Received event $event"))
     }
