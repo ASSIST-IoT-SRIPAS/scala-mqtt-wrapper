@@ -26,9 +26,9 @@ import com.typesafe.scalalogging.LazyLogging
 import scala.concurrent.Future
 
 class MqttClient(
-    mqttSettings: MqttSettings,
-    mqttSessionSettings: MqttSessionSettings = MqttSessionSettings(),
-    name: String = ""
+    val mqttSettings: MqttSettings,
+    val mqttSessionSettings: MqttSessionSettings = MqttSessionSettings(),
+    val name: String = ""
 )(implicit system: ActorSystem[_])
     extends LazyLogging {
   val session: ActorMqttClientSession = ActorMqttClientSession(mqttSessionSettings)
