@@ -17,6 +17,7 @@ object Main {
     import akka.stream.alpakka.mqtt.streaming.Publish
     import akka.stream.KillSwitches
     import akka.stream.scaladsl.Keep
+    import scala.concurrent.ExecutionContextExecutor
 
     implicit val system: ActorSystem[Nothing] = ActorSystem[Nothing](
       Behaviors.setup[Nothing] { context =>
@@ -25,19 +26,25 @@ object Main {
       },
       name = "ScalaMqttWrapper"
     )
-    val source = new MqttSource(
+    implicit val ec: ExecutionContextExecutor = system.executionContext
+
+    val sourceClient = new MqttClient(
       MqttSettings(
         host = "mosquitto",
         port = 1883,
         topics = Seq(MqttTopic("input"))
       )
     )
-    val sink = new MqttSink(
+    val source = new MqttSource(sourceClient)
+
+    val sinkClient = new MqttClient(
       MqttSettings(
         host = "mosquitto",
         port = 1883
       )
     )
+    val sink = new MqttSink(sourceClient)
+
     val uppercaseFlow = Flow[(ByteString, String)].map { case (msg, topic) =>
       val outputMsg = ByteString(msg.utf8String.toUpperCase)
       val outputTopic = "output"
@@ -47,13 +54,15 @@ object Main {
       )
       (outputMsg, outputTopic, publishFlags)
     }
-    val (sourceKillSwitch, sinkKillSwitch) = source.flow
+
+    source.flow
       .via(uppercaseFlow)
       .toMat(sink.flow)(Keep.both)
       .run()
-    Thread.sleep(10000)
-    sourceKillSwitch.shutdown()
-    sinkKillSwitch.shutdown()
-    println("Done")
+
+    Thread.sleep(60000)
+    sourceClient.shutdown().onComplete(_ => println("sourceClient shutdown"))
+    sinkClient.shutdown().onComplete(_ => println("sinkClient shutdown"))
+    println("done")
   }
 }

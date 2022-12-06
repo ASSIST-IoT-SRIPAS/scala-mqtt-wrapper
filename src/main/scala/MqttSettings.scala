@@ -22,5 +22,6 @@ final case class MqttSettings(
     restartMaxBackoff: FiniteDuration = 30.seconds,
     restartRandomFactor: Double = 0.2,
     maxRestarts: Int = -1,
-    restartLogLevel: Logging.LogLevel = Logging.WarningLevel
+    restartLogLevel: Logging.LogLevel = Logging.WarningLevel,
+    broadcastHubBufferSize: Int = 128
 )
