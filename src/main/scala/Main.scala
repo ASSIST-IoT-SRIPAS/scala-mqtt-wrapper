@@ -38,16 +38,17 @@ object Main {
         port = 1883
       )
     )
+    val uppercaseFlow = Flow[(ByteString, String)].map { case (msg, topic) =>
+      val outputMsg = ByteString(msg.utf8String.toUpperCase)
+      val outputTopic = "output"
+      val publishFlags = ControlPacketFlags.QoSAtLeastOnceDelivery | ControlPacketFlags.RETAIN
+      println(
+        s"source [$topic] ${msg.utf8String} --> sink [$outputTopic] ${outputMsg.utf8String}"
+      )
+      (outputMsg, outputTopic, publishFlags)
+    }
     val (sourceKillSwitch, sinkKillSwitch) = source.flow
-      .via(Flow[(ByteString, String)].map { case (msg, topic) =>
-        val outputMsg = ByteString(msg.utf8String.toUpperCase)
-        val outputTopic = "output"
-        val publishFlags = ControlPacketFlags.QoSAtLeastOnceDelivery | ControlPacketFlags.RETAIN
-        println(
-          s"source [$topic] ${msg.utf8String} --> sink [$outputTopic] ${outputMsg.utf8String}"
-        )
-        (outputMsg, outputTopic, publishFlags)
-      })
+      .via(uppercaseFlow)
       .toMat(sink.flow)(Keep.both)
       .run()
     Thread.sleep(10000)
