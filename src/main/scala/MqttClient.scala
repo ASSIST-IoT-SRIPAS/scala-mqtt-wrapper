@@ -27,7 +27,8 @@ import scala.concurrent.Future
 
 class MqttClient(
     mqttSettings: MqttSettings,
-    mqttSessionSettings: MqttSessionSettings = MqttSessionSettings()
+    mqttSessionSettings: MqttSessionSettings = MqttSessionSettings(),
+    name: String = ""
 )(implicit system: ActorSystem[_])
     extends LazyLogging {
   val session: ActorMqttClientSession = ActorMqttClientSession(mqttSessionSettings)
@@ -61,7 +62,7 @@ class MqttClient(
       Source(initialCommands)
         .concatMat(Source.never)(Keep.left)
         .via(sessionFlow)
-        .wireTap(event => logger.debug(s"Received event $event"))
+        .wireTap(event => logger.debug(s"[$name] Received event $event"))
     }
   val (sourceBroadcastKillSwitch, sourceBroadcast) = {
     source
@@ -70,6 +71,9 @@ class MqttClient(
       .run()
   }
   val sourceBroadcastFuture: Future[Done] = sourceBroadcast.runWith(Sink.ignore)
+  sourceBroadcastFuture.onComplete(_ => logger.debug(s"[$name] Source broadcast hub shutdown"))(
+    system.executionContext
+  )
   def shutdown(): Future[Done] = {
     sourceBroadcastKillSwitch.shutdown()
     sourceBroadcastFuture
