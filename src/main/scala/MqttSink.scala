@@ -10,8 +10,10 @@ import akka.stream.scaladsl.Sink
 import akka.util.ByteString
 import com.typesafe.scalalogging.LazyLogging
 
-class MqttSink(mqttClient: MqttClient)(implicit system: ActorSystem[_]) extends LazyLogging {
-  val flow: Sink[(ByteString, String, ControlPacketFlags), NotUsed] =
+object MqttSink extends LazyLogging {
+  def sink(
+      mqttClient: MqttClient
+  )(implicit system: ActorSystem[_]): Sink[(ByteString, String, ControlPacketFlags), NotUsed] =
     Flow[(ByteString, String, ControlPacketFlags)]
       .wireTap(data =>
         logger.debug(s"Sending message [${data._1.utf8String}] to topic [${data._2}]")
