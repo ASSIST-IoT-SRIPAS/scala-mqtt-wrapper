@@ -38,8 +38,7 @@ object Main {
         port = 1883
       )
     )
-    val stream = source.flow
-      .viaMat(KillSwitches.single)(Keep.right)
+    val (sourceKillSwitch, sinkKillSwitch) = source.flow
       .via(Flow[(ByteString, String)].map { case (msg, topic) =>
         val outputMsg = ByteString(msg.utf8String.toUpperCase)
         val outputTopic = "output"
@@ -49,10 +48,11 @@ object Main {
         )
         (outputMsg, outputTopic, publishFlags)
       })
-      .to(sink.flow)
+      .toMat(sink.flow)(Keep.both)
       .run()
     Thread.sleep(10000)
-    stream.shutdown()
+    sourceKillSwitch.shutdown()
+    sinkKillSwitch.shutdown()
     println("Done")
   }
 }
