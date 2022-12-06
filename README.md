@@ -84,7 +84,11 @@ sinkClient.shutdown()
 ```
 
 ## Documentation <a name = "documentation" />
-TODO
+- [MqttClient](src/main/scala/pl/waw/ibspan/scala_mqtt_wrapper/MqttClient.scala)
+- [MqttSettings](src/main/scala/pl/waw/ibspan/scala_mqtt_wrapper/MqttSettings.scala)
+- [MqttSink](src/main/scala/pl/waw/ibspan/scala_mqtt_wrapper/MqttSink.scala)
+- [MqttSource](src/main/scala/pl/waw/ibspan/scala_mqtt_wrapper/MqttSource.scala)
+- [MqttTopic](src/main/scala/pl/waw/ibspan/scala_mqtt_wrapper/MqttTopic.scala)
 
 ## Contributing <a name = "contributing" />
 Please follow the [contributing guide](CONTRIBUTING.md) if you wish to contribute to the project.
