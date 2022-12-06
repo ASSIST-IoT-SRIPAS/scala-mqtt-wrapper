@@ -45,7 +45,7 @@ object Main {
       ),
       name = "sinkClient"
     )
-    val sink = MqttSink.sink(sourceClient)
+    val sink = MqttSink.sink(sinkClient)
 
     val uppercaseFlow = Flow[(ByteString, String)].map { case (msg, topic) =>
       val outputMessage = ByteString(msg.utf8String.toUpperCase)
@@ -61,7 +61,7 @@ object Main {
       .via(uppercaseFlow)
       .runWith(sink)
 
-    Thread.sleep(5000)
+    Thread.sleep(60000)
     sourceClient.shutdown()
     sinkClient.shutdown()
     println("done")
