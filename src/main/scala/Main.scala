@@ -33,7 +33,8 @@ object Main {
         host = "mosquitto",
         port = 1883,
         topics = Seq(MqttTopic("input"))
-      )
+      ),
+      name = "sourceClient"
     )
     val source = new MqttSource(sourceClient)
 
@@ -41,28 +42,28 @@ object Main {
       MqttSettings(
         host = "mosquitto",
         port = 1883
-      )
+      ),
+      name = "sinkClient"
     )
     val sink = new MqttSink(sourceClient)
 
     val uppercaseFlow = Flow[(ByteString, String)].map { case (msg, topic) =>
-      val outputMsg = ByteString(msg.utf8String.toUpperCase)
+      val outputMessage = ByteString(msg.utf8String.toUpperCase)
       val outputTopic = "output"
       val publishFlags = ControlPacketFlags.QoSAtLeastOnceDelivery | ControlPacketFlags.RETAIN
       println(
-        s"source [$topic] ${msg.utf8String} --> sink [$outputTopic] ${outputMsg.utf8String}"
+        s"source [$topic] ${msg.utf8String} --> sink [$outputTopic] ${outputMessage.utf8String}"
       )
-      (outputMsg, outputTopic, publishFlags)
+      (outputMessage, outputTopic, publishFlags)
     }
 
     source.flow
       .via(uppercaseFlow)
-      .toMat(sink.flow)(Keep.both)
-      .run()
+      .runWith(sink.flow)
 
-    Thread.sleep(60000)
-    sourceClient.shutdown().onComplete(_ => println("sourceClient shutdown"))
-    sinkClient.shutdown().onComplete(_ => println("sinkClient shutdown"))
+    Thread.sleep(5000)
+    sourceClient.shutdown()
+    sinkClient.shutdown()
     println("done")
   }
 }
