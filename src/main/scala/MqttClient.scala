@@ -27,13 +27,26 @@ import com.typesafe.scalalogging.LazyLogging
 
 import scala.concurrent.Future
 
+/** MQTT client
+  *
+  * @constructor
+  *   create a new MQTT client
+  * @param mqttSettings
+  *   MQTT client settings
+  * @param mqttSessionSettings
+  *   MQTT session settings
+  * @param name
+  *   MQTT client name used for logging
+  * @param system
+  *   actor system
+  */
 class MqttClient(
     val mqttSettings: MqttSettings,
     val mqttSessionSettings: MqttSessionSettings = MqttSessionSettings(),
     val name: String = ""
 )(implicit system: ActorSystem[_])
     extends LazyLogging {
-  // mqtt session
+  // prepare MQTT client session
   val session: ActorMqttClientSession = ActorMqttClientSession(mqttSessionSettings)
   val tcpConnection: Flow[ByteString, ByteString, Future[Tcp.OutgoingConnection]] =
     Tcp(system).outgoingConnection(mqttSettings.host, mqttSettings.port)
@@ -42,7 +55,9 @@ class MqttClient(
       .clientSessionFlow(session, mqttSettings.sessionId)
       .join(tcpConnection)
 
-  // initial commands
+  // prepare initial commands
+  // the first one connects the client to the broker
+  // the consecutive commands subscribe to topics
   val connectCommand: Command[Nothing] =
     Command[Nothing](
       Connect(
@@ -56,7 +71,9 @@ class MqttClient(
     mqttSettings.topics.map(topic => Command[Nothing](Subscribe(topic.name))).toList
   val initialCommands: List[Command[Nothing]] = connectCommand :: subscribeCommands
 
-  // commands queue
+  // create a queue `commands` that accepts client commands
+  // `commandsBroadcast` broadcasts the queue commands
+  // `bufferSize` should not be smaller than the number of initial commands
   val (commands, commandsBroadcast) = Source
     .queue[Command[Nothing]](
       bufferSize = mqttSettings.commandsBroadcastBufferSize,
@@ -68,7 +85,7 @@ class MqttClient(
     .watchCompletion()
     .onComplete(_ => logger.debug(s"[$name] Commands queue completed"))(system.executionContext)
 
-  // events source
+  // create settings for restarting the MQTT events source
   val restartingEventsSourceSettings: RestartSettings = RestartSettings(
     minBackoff = mqttSettings.restartMinBackoff,
     maxBackoff = mqttSettings.restartMaxBackoff,
@@ -76,6 +93,10 @@ class MqttClient(
   )
     .withMaxRestarts(mqttSettings.maxRestarts, mqttSettings.restartMinBackoff)
     .withLogSettings(RestartSettings.createLogSettings(logLevel = mqttSettings.restartLogLevel))
+  // create the MQTT source that restarts on failure
+  // the initial commands are sent to the command queue
+  // then their broadcast is connected to the MQTT session flow
+  // the MQTT session flow produces MQTT events
   val restartingEventsSource: Source[Either[MqttCodec.DecodeError, Event[Nothing]], NotUsed] =
     RestartSource.withBackoff(restartingEventsSourceSettings) { () =>
       for (command <- initialCommands) {
@@ -95,6 +116,9 @@ class MqttClient(
         .via(sessionFlow)
         .wireTap(event => logger.debug(s"[$name] Received event $event"))
     }
+  // create `eventsBroadcast` that broadcasts the MQTT events
+  // and a kill switch that can be used to stop the MQTT session flow
+  // `bufferSize` is not that important as a consumer with `Sink.ignore` is created immediately
   val (eventsBroadcastKillSwitch, eventsBroadcast) = {
     restartingEventsSource
       .viaMat(KillSwitches.single)(Keep.right)
@@ -106,6 +130,11 @@ class MqttClient(
     system.executionContext
   )
 
+  /** Shutdown the client
+    *
+    * @return
+    *   a future that completes after stopping the MQTT session and closing the command queue
+    */
   def shutdown(): Future[Done] = {
     commands.complete()
     eventsBroadcastKillSwitch.shutdown()
