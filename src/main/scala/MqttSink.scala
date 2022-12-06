@@ -16,7 +16,10 @@ object MqttSink extends LazyLogging {
   )(implicit system: ActorSystem[_]): Sink[(ByteString, String, ControlPacketFlags), NotUsed] =
     Flow[(ByteString, String, ControlPacketFlags)]
       .wireTap(data =>
-        logger.debug(s"Sending message [${data._1.utf8String}] to topic [${data._2}]")
+        logger.debug(
+          "[%s] Sending message [%s] to topic [%s]"
+            .format(mqttClient.name, data._1.utf8String, data._2)
+        )
       )
       .map { case (msg, topic, publishFlags) =>
         mqttClient.session ! Command[Nothing](Publish(publishFlags, topic, msg))

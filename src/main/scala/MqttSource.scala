@@ -15,4 +15,10 @@ object MqttSource extends LazyLogging {
     .collect { case Right(Event(p: Publish, _)) =>
       (p.payload, p.topicName)
     }
+    .wireTap(data =>
+      logger.debug(
+        "[%s] Received message [%s] from topic [%s]"
+          .format(mqttClient.name, data._1.utf8String, data._2)
+      )
+    )
 }
