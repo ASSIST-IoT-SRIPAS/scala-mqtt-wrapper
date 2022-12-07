@@ -39,7 +39,7 @@ import utils.Uuid.generateUuid
   *   MQTT restart log level
   * @param commandMergeSinkPerProducerBufferSize
   *   buffer space used per producer for command sink merge hub
-  * @param commandBroadcastBufferSize
+  * @param commandBroadcastSourceBufferSize
   *   MQTT commands broadcast buffer size, must be a power of 2
   * @param eventBroadcastBufferSize
   *   MQTT events broadcast buffer size, must be a power of 2
@@ -65,7 +65,7 @@ final case class MqttSettings(
     maxRestarts: Int = -1,
     restartLogLevel: Logging.LogLevel = Logging.WarningLevel,
     commandMergeSinkPerProducerBufferSize: Int = 16,
-    commandBroadcastBufferSize: Int = 128,
+    commandBroadcastSourceBufferSize: Int = 128,
     eventBroadcastBufferSize: Int = 128,
     withEventBroadcastBackpressure: Boolean = false,
     publishSinkPerProducerBufferSize: Int = 32

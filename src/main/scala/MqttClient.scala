@@ -79,10 +79,10 @@ class MqttClient(
   // the kill switch is used to stop the merge-broadcast stream
   // while deciding on the buffer sizes note that there is at least one broadcast consumer
   // (while the MQTT session flow is running; i.e. it is not restarting)
-  val ((commandMergeSink, commandMergeSinkKillSwitch), commandBroadcast) = MergeHub
+  val ((commandMergeSink, commandMergeSinkKillSwitch), commandBroadcastSource) = MergeHub
     .source[Command[Nothing]](perProducerBufferSize = mqttSettings.commandMergeSinkPerProducerBufferSize)
     .viaMat(KillSwitches.single)(Keep.both)
-    .toMat(BroadcastHub.sink(bufferSize = mqttSettings.commandBroadcastBufferSize))(Keep.both)
+    .toMat(BroadcastHub.sink(bufferSize = mqttSettings.commandBroadcastSourceBufferSize))(Keep.both)
     .run()
 
   // create settings for restarting the MQTT event source
@@ -101,7 +101,7 @@ class MqttClient(
   val restartingEventSource: Source[Either[MqttCodec.DecodeError, Event[Nothing]], NotUsed] =
     RestartSource.withBackoff(restartingEventSourceSettings) { () =>
       Source(initialCommands)
-        .concatMat(commandBroadcast)(Keep.right)
+        .concatMat(commandBroadcastSource)(Keep.right)
         .via(sessionFlow)
         .wireTap(event => logger.debug(s"[$name] Received event $event"))
     }
