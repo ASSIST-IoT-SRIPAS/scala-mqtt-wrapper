@@ -80,7 +80,9 @@ class MqttClient(
   // while deciding on the buffer sizes note that there is at least one broadcast consumer
   // (while the MQTT session flow is running; i.e. it is not restarting)
   val ((commandMergeSink, commandMergeSinkKillSwitch), commandBroadcastSource) = MergeHub
-    .source[Command[Nothing]](perProducerBufferSize = mqttSettings.commandMergeSinkPerProducerBufferSize)
+    .source[Command[Nothing]](perProducerBufferSize =
+      mqttSettings.commandMergeSinkPerProducerBufferSize
+    )
     .viaMat(KillSwitches.single)(Keep.both)
     .toMat(BroadcastHub.sink(bufferSize = mqttSettings.commandBroadcastSourceBufferSize))(Keep.both)
     .run()
@@ -137,9 +139,9 @@ class MqttClient(
   // create a publish sink (a merge hub) that publishes messages to the MQTT broker
   // a kill switch is used to kill the merge hub
   // as it is not stopped when the MQTT session flow is stopped
-  val ((publishSink, publishSinkKillSwitch), publishSinkFuture) = MergeHub
+  val ((publishMergeSink, publishMergeSinkKillSwitch), publishMergeSinkFuture) = MergeHub
     .source[(ByteString, String, ControlPacketFlags)](perProducerBufferSize =
-      mqttSettings.publishSinkPerProducerBufferSize
+      mqttSettings.publishMergeSinkPerProducerBufferSize
     )
     .viaMat(KillSwitches.single)(Keep.both)
     .map { case (msg, topic, publishFlags) =>
@@ -147,7 +149,7 @@ class MqttClient(
     }
     .toMat(Sink.ignore)(Keep.both)
     .run()
-  publishSinkFuture.onComplete(_ => logger.debug(s"[$name] Publish sink shutdown"))(
+  publishMergeSinkFuture.onComplete(_ => logger.debug(s"[$name] Publish merge sink shutdown"))(
     system.executionContext
   )
 
@@ -159,13 +161,15 @@ class MqttClient(
     */
   def shutdown(): Future[Done] = {
     commandMergeSinkKillSwitch.shutdown()
-    publishSinkKillSwitch.shutdown()
+    publishMergeSinkKillSwitch.shutdown()
     eventBroadcastSourceKillSwitch.shutdown()
     val eventBroadcastConsumerFutureDone: Future[Done] = eventBroadcastConsumerFuture match {
       case Some(future) => future
       case None         => Future.successful(Done)
     }
-    Future.reduceLeft(Seq(publishSinkFuture, eventBroadcastConsumerFutureDone))((_, _) => Done)(
+    Future.reduceLeft(Seq(publishMergeSinkFuture, eventBroadcastConsumerFutureDone))((_, _) =>
+      Done
+    )(
       system.executionContext
     )
   }

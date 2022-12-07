@@ -24,5 +24,5 @@ object MqttSink extends LazyLogging {
             .format(mqttClient.name, data._1.utf8String, data._2)
         )
       )
-      .to(mqttClient.publishSink)
+      .to(mqttClient.publishMergeSink)
 }
