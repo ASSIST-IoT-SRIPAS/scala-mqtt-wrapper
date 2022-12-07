@@ -106,7 +106,7 @@ class MqttClient(
     }
   // create `eventsBroadcast` that broadcasts the MQTT events
   // and a kill switch that can be used to stop the MQTT session flow
-  // `bufferSize` is not that important as a consumer with `Sink.ignore` is created immediately
+  // `bufferSize` is not that important as a consumer (with `Sink.ignore`) is created immediately
   val (eventsBroadcastKillSwitch, eventsBroadcast) = {
     restartingEventsSource
       .viaMat(KillSwitches.single)(Keep.right)
