@@ -95,6 +95,7 @@ class MqttClient(
   )
     .withMaxRestarts(mqttSettings.maxRestarts, mqttSettings.restartMinBackoff)
     .withLogSettings(RestartSettings.createLogSettings(logLevel = mqttSettings.restartLogLevel))
+
   // create the MQTT source that restarts on failure
   // first, the initial commands are sent to the broker
   // then the command broadcast is connected to the MQTT session flow
@@ -106,6 +107,7 @@ class MqttClient(
         .via(sessionFlow)
         .wireTap(event => logger.debug(s"[$name] Received event $event"))
     }
+
   // create `eventBroadcast` that broadcasts the MQTT events
   // and a kill switch that can be used to stop the MQTT session flow
   // `bufferSize` is not that important in case a consumer (with `Sink.ignore`) is created
