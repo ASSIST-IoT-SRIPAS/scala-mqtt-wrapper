@@ -45,14 +45,14 @@ object Main {
 
     // create a flow that converts the incoming messages to uppercase
     // and publishes them to the "output" topic
-    val uppercaseFlow = Flow[(ByteString, String)].map { case (msg, topic) =>
-      val outputMessage = ByteString(msg.utf8String.toUpperCase)
+    val uppercaseFlow = Flow[MqttReceivedMessage].map { case MqttReceivedMessage(payload, topic) =>
+      val outputPayload = ByteString(payload.utf8String.toUpperCase)
       val outputTopic = "output"
       val publishFlags = ControlPacketFlags.QoSAtLeastOnceDelivery | ControlPacketFlags.RETAIN
       println(
-        s"source [$topic] ${msg.utf8String} --> sink [$outputTopic] ${outputMessage.utf8String}"
+        s"source [$topic] ${payload.utf8String} --> sink [$outputTopic] ${outputPayload.utf8String}"
       )
-      (outputMessage, outputTopic, publishFlags)
+      MqttPublishMessage(outputPayload, outputTopic, publishFlags)
     }
 
     // run the stream
