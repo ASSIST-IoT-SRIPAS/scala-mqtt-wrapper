@@ -103,6 +103,7 @@ class MqttClient(
       Source(initialCommands)
         .concatMat(commandBroadcastSource)(Keep.right)
         .via(sessionFlow)
+        // TODO: use .log() instead
         .wireTap(event => logger.debug(s"[$name] Received event $event"))
     }
 
