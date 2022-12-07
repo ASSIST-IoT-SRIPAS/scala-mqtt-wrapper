@@ -1,4 +1,4 @@
-ThisBuild / version := "1.0.0-rc0"
+ThisBuild / version := "1.0.0-rc1"
 ThisBuild / scalaVersion := "2.13.10"
 ThisBuild / organization := "pl.waw.ibspan"
 
