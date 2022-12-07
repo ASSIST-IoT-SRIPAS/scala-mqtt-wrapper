@@ -37,16 +37,18 @@ import utils.Uuid.generateUuid
   *   MQTT maximum restarts, set to -1 for infinite restarts
   * @param restartLogLevel
   *   MQTT restart log level
-  * @param commandBroadcastBufferSize
+  * @param commandMergeSinkPerProducerBufferSize
+  *   buffer space used per producer for command sink merge hub
+  * @param commandBroadcastSourceBufferSize
   *   MQTT commands broadcast buffer size, must be a power of 2
-  * @param eventBroadcastBufferSize
+  * @param eventBroadcastSourceBufferSize
   *   MQTT events broadcast buffer size, must be a power of 2
-  * @param withEventBroadcastBackpressure
+  * @param withEventBroadcastSourceBackpressure
   *   if true, the event broadcast will store events in a buffer until there is demand and
   *   eventually apply backpressure on the MQTT session flow; if false, the events will be always
   *   consumed even if there is no external demand
-  * @param publishSinkPerProducerBufferSize
-  *   buffer space used per producer for publish sink
+  * @param publishMergeSinkPerProducerBufferSize
+  *   buffer space used per producer for publish merge sink
   */
 final case class MqttSettings(
     host: String,
@@ -62,8 +64,9 @@ final case class MqttSettings(
     restartRandomFactor: Double = 0.2,
     maxRestarts: Int = -1,
     restartLogLevel: Logging.LogLevel = Logging.WarningLevel,
-    commandBroadcastBufferSize: Int = 128,
-    eventBroadcastBufferSize: Int = 128,
-    withEventBroadcastBackpressure: Boolean = false,
-    publishSinkPerProducerBufferSize: Int = 32
+    commandMergeSinkPerProducerBufferSize: Int = 16,
+    commandBroadcastSourceBufferSize: Int = 128,
+    eventBroadcastSourceBufferSize: Int = 128,
+    withEventBroadcastSourceBackpressure: Boolean = false,
+    publishMergeSinkPerProducerBufferSize: Int = 32
 )
