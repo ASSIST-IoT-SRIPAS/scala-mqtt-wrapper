@@ -44,7 +44,7 @@ import scala.concurrent.Future
 class MqttClient(
     val mqttSettings: MqttSettings,
     val mqttSessionSettings: MqttSessionSettings = MqttSessionSettings(),
-    val name: String = ""
+    val name: String = "",
 )(implicit system: ActorSystem[_])
     extends LazyLogging {
   // prepare MQTT client session
@@ -65,7 +65,7 @@ class MqttClient(
         clientId = mqttSettings.clientId,
         extraConnectFlags = mqttSettings.connectFlags,
         username = mqttSettings.username,
-        password = mqttSettings.password
+        password = mqttSettings.password,
       )
     )
   val subscribeCommands: List[Command[Nothing]] =
@@ -90,7 +90,7 @@ class MqttClient(
   val restartingEventSourceSettings: RestartSettings = RestartSettings(
     minBackoff = mqttSettings.restartMinBackoff,
     maxBackoff = mqttSettings.restartMaxBackoff,
-    randomFactor = mqttSettings.restartRandomFactor
+    randomFactor = mqttSettings.restartRandomFactor,
   )
     .withMaxRestarts(mqttSettings.maxRestarts, mqttSettings.restartMinBackoff)
     .withLogSettings(RestartSettings.createLogSettings(logLevel = mqttSettings.restartLogLevel))

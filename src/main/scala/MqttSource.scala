@@ -16,6 +16,7 @@ object MqttSource extends LazyLogging {
     */
   def source(mqttClient: MqttClient): Source[(ByteString, String), NotUsed] =
     mqttClient.publishEventBroadcastSource
+      // TODO: use .log() instead
       .wireTap(data =>
         logger.debug(
           "[%s] Received message [%s] from topic [%s]"

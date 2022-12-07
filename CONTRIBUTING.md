@@ -29,3 +29,15 @@ TODO
 
 ## Code style
 TODO
+
+## Releases
+Commits to main will trigger a SNAPSHOT release.
+
+To create a full release, create a tag on the main branch like so:
+
+```shell
+git tag -a v0.1.0 -m "v0.1.0"
+git push origin v0.1.0
+```
+
+The releases should be pushed to Maven Central.

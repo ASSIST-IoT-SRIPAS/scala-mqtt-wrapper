@@ -6,7 +6,7 @@ Scala wrapper for [the Alpakka MQTT Streaming library](https://doc.akka.io/docs/
 ## Installation <a name = "installation" />
 Add the following to your `build.sbt` file:
 ```scala
-libraryDependencies += TODO
+libraryDependencies += "io.github.assist-iot-sripas" %% "scala-mqtt-wrapper" % "(version)"
 ```
 Currently, the supported Scala version is `2.13.10`.
 
@@ -15,12 +15,13 @@ Currently, the supported Scala version is `2.13.10`.
 ```scala
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
+import akka.stream.alpakka.mqtt.streaming.Command
+import akka.stream.alpakka.mqtt.streaming.ControlPacketFlags
+import akka.stream.alpakka.mqtt.streaming.Subscribe
 import akka.stream.scaladsl.Flow
 import akka.stream.scaladsl.Source
 import akka.util.ByteString
-import akka.stream.alpakka.mqtt.streaming.ControlPacketFlags
-import akka.stream.alpakka.mqtt.streaming.Command
-import akka.stream.alpakka.mqtt.streaming.Subscribe
+
 import pl.waw.ibspan.scala_mqtt_wrapper.MqttClient
 import pl.waw.ibspan.scala_mqtt_wrapper.MqttSettings
 import pl.waw.ibspan.scala_mqtt_wrapper.MqttSink

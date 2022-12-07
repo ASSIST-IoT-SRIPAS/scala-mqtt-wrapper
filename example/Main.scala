@@ -1,5 +1,3 @@
-package pl.waw.ibspan.scala_mqtt_wrapper
-
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
 import akka.stream.alpakka.mqtt.streaming.Command
@@ -9,11 +7,16 @@ import akka.stream.scaladsl.Flow
 import akka.stream.scaladsl.Source
 import akka.util.ByteString
 
+import pl.waw.ibspan.scala_mqtt_wrapper.MqttClient
+import pl.waw.ibspan.scala_mqtt_wrapper.MqttSettings
+import pl.waw.ibspan.scala_mqtt_wrapper.MqttSink
+import pl.waw.ibspan.scala_mqtt_wrapper.MqttSource
+import pl.waw.ibspan.scala_mqtt_wrapper.MqttTopic
+
 object Main {
   def main(args: Array[String]): Unit = {
     implicit val system: ActorSystem[Nothing] = ActorSystem[Nothing](
       Behaviors.setup[Nothing] { context =>
-        context.log.info("system started")
         Behaviors.empty
       },
       name = "scalaMqttWrapper",
