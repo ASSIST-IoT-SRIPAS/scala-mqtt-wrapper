@@ -41,6 +41,8 @@ import utils.Uuid.generateUuid
   *   MQTT commands broadcast buffer size, must be a power of 2
   * @param eventsBroadcastBufferSize
   *   MQTT events broadcast buffer size, must be a power of 2
+  * @param publishSinkPerProducerBufferSize
+  *   buffer space used per producer for publish sink
   */
 final case class MqttSettings(
     host: String,
@@ -57,5 +59,6 @@ final case class MqttSettings(
     maxRestarts: Int = -1,
     restartLogLevel: Logging.LogLevel = Logging.WarningLevel,
     commandsBroadcastBufferSize: Int = 128,
-    eventsBroadcastBufferSize: Int = 128
+    eventsBroadcastBufferSize: Int = 128,
+    publishSinkPerProducerBufferSize: Int = 32
 )

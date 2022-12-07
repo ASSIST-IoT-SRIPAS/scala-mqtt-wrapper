@@ -5,19 +5,21 @@ import akka.NotUsed
 import akka.actor.typed.ActorSystem
 import akka.stream.KillSwitches
 import akka.stream.OverflowStrategy
-import akka.stream.QueueOfferResult
 import akka.stream.RestartSettings
 import akka.stream.alpakka.mqtt.streaming.Command
 import akka.stream.alpakka.mqtt.streaming.Connect
+import akka.stream.alpakka.mqtt.streaming.ControlPacketFlags
 import akka.stream.alpakka.mqtt.streaming.Event
 import akka.stream.alpakka.mqtt.streaming.MqttCodec
 import akka.stream.alpakka.mqtt.streaming.MqttSessionSettings
+import akka.stream.alpakka.mqtt.streaming.Publish
 import akka.stream.alpakka.mqtt.streaming.Subscribe
 import akka.stream.alpakka.mqtt.streaming.scaladsl.ActorMqttClientSession
 import akka.stream.alpakka.mqtt.streaming.scaladsl.Mqtt
 import akka.stream.scaladsl.BroadcastHub
 import akka.stream.scaladsl.Flow
 import akka.stream.scaladsl.Keep
+import akka.stream.scaladsl.MergeHub
 import akka.stream.scaladsl.RestartSource
 import akka.stream.scaladsl.Sink
 import akka.stream.scaladsl.Source
@@ -118,15 +120,36 @@ class MqttClient(
     system.executionContext
   )
 
+  // create a publish sink (a merge hub) that publishes messages to the MQTT broker
+  // a kill switch is used to kill the merge hub
+  // as it is not stopped when the MQTT session flow is stopped
+  val ((publishSink, publishSinkKillSwitch), publishSinkFuture) = MergeHub
+    .source[(ByteString, String, ControlPacketFlags)](perProducerBufferSize =
+      mqttSettings.publishSinkPerProducerBufferSize
+    )
+    .viaMat(KillSwitches.single)(Keep.both)
+    .map { case (msg, topic, publishFlags) =>
+      session ! Command[Nothing](Publish(publishFlags, topic, msg))
+    }
+    .toMat(Sink.ignore)(Keep.both)
+    .run()
+  publishSinkFuture.onComplete(_ => logger.debug(s"[$name] Publish sink shutdown"))(
+    system.executionContext
+  )
+
   /** Shutdown the client
     *
     * @return
-    *   a future that completes after stopping the MQTT session and closing the command queue
+    *   a future that completes after stopping the MQTT session, closing the publish sink, and
+    *   closing the command queue
     */
   def shutdown(): Future[Done] = {
     commands.complete()
+    publishSinkKillSwitch.shutdown()
     eventsBroadcastKillSwitch.shutdown()
-    Future.reduceLeft(Seq(commands.watchCompletion(), eventsBroadcastFuture))((_, _) => Done)(
+    Future.reduceLeft(Seq(commands.watchCompletion(), publishSinkFuture, eventsBroadcastFuture))(
+      (_, _) => Done
+    )(
       system.executionContext
     )
   }

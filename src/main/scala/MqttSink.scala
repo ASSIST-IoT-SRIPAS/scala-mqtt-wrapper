@@ -2,9 +2,7 @@ package pl.waw.ibspan.scala_mqtt_wrapper
 
 import akka.NotUsed
 import akka.actor.typed.ActorSystem
-import akka.stream.alpakka.mqtt.streaming.Command
 import akka.stream.alpakka.mqtt.streaming.ControlPacketFlags
-import akka.stream.alpakka.mqtt.streaming.Publish
 import akka.stream.scaladsl.Flow
 import akka.stream.scaladsl.Sink
 import akka.util.ByteString
@@ -31,8 +29,5 @@ object MqttSink extends LazyLogging {
             .format(mqttClient.name, data._1.utf8String, data._2)
         )
       )
-      .map { case (msg, topic, publishFlags) =>
-        mqttClient.session ! Command[Nothing](Publish(publishFlags, topic, msg))
-      }
-      .to(Sink.ignore)
+      .to(mqttClient.publishSink)
 }
