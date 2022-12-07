@@ -7,7 +7,6 @@ import akka.stream.KillSwitches
 import akka.stream.RestartSettings
 import akka.stream.alpakka.mqtt.streaming.Command
 import akka.stream.alpakka.mqtt.streaming.Connect
-import akka.stream.alpakka.mqtt.streaming.ControlPacketFlags
 import akka.stream.alpakka.mqtt.streaming.Event
 import akka.stream.alpakka.mqtt.streaming.MqttCodec
 import akka.stream.alpakka.mqtt.streaming.MqttSessionSettings
@@ -130,21 +129,21 @@ class MqttClient(
     }
 
   // helper broadcast source that collects only MQTT publish events
-  val publishEventBroadcastSource: Source[(ByteString, String), NotUsed] = eventBroadcastSource
+  val publishEventBroadcastSource: Source[MqttReceivedMessage, NotUsed] = eventBroadcastSource
     .collect { case Right(Event(p: Publish, _)) =>
-      (p.payload, p.topicName)
+      MqttReceivedMessage(p.payload, p.topicName)
     }
 
   // create a publish sink (a merge hub) that publishes messages to the MQTT broker
   // a kill switch is used to kill the merge hub
   // as it is not stopped when the MQTT session flow is stopped
   val ((publishMergeSink, publishMergeSinkKillSwitch), publishMergeSinkFuture) = MergeHub
-    .source[(ByteString, String, ControlPacketFlags)](perProducerBufferSize =
+    .source[MqttPublishMessage](perProducerBufferSize =
       mqttSettings.publishMergeSinkPerProducerBufferSize
     )
     .viaMat(KillSwitches.single)(Keep.both)
-    .map { case (msg, topic, publishFlags) =>
-      session ! Command[Nothing](Publish(publishFlags, topic, msg))
+    .map { case MqttPublishMessage(payload, topic, publishFlags) =>
+      session ! Command[Nothing](Publish(publishFlags, topic, payload))
     }
     .toMat(Sink.ignore)(Keep.both)
     .run()
