@@ -16,13 +16,13 @@ object MqttSink extends LazyLogging {
     * @param mqttClient
     *   MQTT client
     */
-  def sink(mqttClient: MqttClient): Sink[(ByteString, String, ControlPacketFlags), NotUsed] =
-    Flow[(ByteString, String, ControlPacketFlags)]
+  def sink(mqttClient: MqttClient): Sink[MqttPublishMessage, NotUsed] =
+    Flow[MqttPublishMessage]
       // TODO: use .log() instead
       .wireTap(data =>
         logger.debug(
           "[%s] Sending message [%s] to topic [%s]"
-            .format(mqttClient.name, data._1.utf8String, data._2)
+            .format(mqttClient.name, data.message.utf8String, data.topic)
         )
       )
       .to(mqttClient.publishMergeSink)
