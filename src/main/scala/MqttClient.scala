@@ -128,8 +128,8 @@ class MqttClient(
       None
     }
 
-  // helper broadcast that collects only MQTT publish events
-  val publishEventBroadcast: Source[(ByteString, String), NotUsed] = eventBroadcastSource
+  // helper broadcast source that collects only MQTT publish events
+  val publishEventBroadcastSource: Source[(ByteString, String), NotUsed] = eventBroadcastSource
     .collect { case Right(Event(p: Publish, _)) =>
       (p.payload, p.topicName)
     }
