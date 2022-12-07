@@ -11,6 +11,7 @@ libraryDependencies += TODO
 Currently, the supported Scala version is `2.13.10`.
 
 ## Example <a name = "example" />
+
 ```scala
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
@@ -75,7 +76,7 @@ source
   .runWith(sink)
 
 // send a command to the client to subscribe to "testTopic"
-sourceClient.commands.offer(Command[Nothing](Subscribe("testTopic")))
+sourceClient.commandQueue.offer(Command[Nothing](Subscribe("testTopic")))
 
 // after some time, shutdown the clients
 Thread.sleep(60000)

@@ -62,7 +62,7 @@ object Main {
       .via(uppercaseFlow)
       .runWith(sink)
 
-    sourceClient.commands.offer(Command[Nothing](Subscribe("test")))
+    sourceClient.commandQueue.offer(Command[Nothing](Subscribe("test")))
 
     Thread.sleep(60000)
     sourceClient.shutdown()

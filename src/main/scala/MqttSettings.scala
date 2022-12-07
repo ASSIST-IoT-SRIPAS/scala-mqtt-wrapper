@@ -37,9 +37,9 @@ import utils.Uuid.generateUuid
   *   MQTT maximum restarts, set to -1 for infinite restarts
   * @param restartLogLevel
   *   MQTT restart log level
-  * @param commandsBroadcastBufferSize
+  * @param commandBroadcastBufferSize
   *   MQTT commands broadcast buffer size, must be a power of 2
-  * @param eventsBroadcastBufferSize
+  * @param eventBroadcastBufferSize
   *   MQTT events broadcast buffer size, must be a power of 2
   * @param publishSinkPerProducerBufferSize
   *   buffer space used per producer for publish sink
@@ -58,7 +58,7 @@ final case class MqttSettings(
     restartRandomFactor: Double = 0.2,
     maxRestarts: Int = -1,
     restartLogLevel: Logging.LogLevel = Logging.WarningLevel,
-    commandsBroadcastBufferSize: Int = 128,
-    eventsBroadcastBufferSize: Int = 128,
+    commandBroadcastBufferSize: Int = 128,
+    eventBroadcastBufferSize: Int = 128,
     publishSinkPerProducerBufferSize: Int = 32
 )

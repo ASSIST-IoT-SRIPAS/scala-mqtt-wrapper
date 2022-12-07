@@ -73,22 +73,22 @@ class MqttClient(
     mqttSettings.topics.map(topic => Command[Nothing](Subscribe(topic.name))).toList
   val initialCommands: List[Command[Nothing]] = connectCommand :: subscribeCommands
 
-  // create a queue `commands` that accepts client commands
-  // the commands sent to the queue are not persisted between restarts
-  // `commandsBroadcast` broadcasts the queue commands
-  val (commands, commandsBroadcast) = Source
+  // create a queue that accepts client commands
+  // note that the commands sent to the queue are not persisted between restarts
+  // `commandQueueBroadcast` broadcasts the queue commands
+  val (commandQueue, commandQueueBroadcast) = Source
     .queue[Command[Nothing]](
-      bufferSize = mqttSettings.commandsBroadcastBufferSize,
+      bufferSize = mqttSettings.commandBroadcastBufferSize,
       overflowStrategy = OverflowStrategy.backpressure
     )
-    .toMat(BroadcastHub.sink(bufferSize = mqttSettings.commandsBroadcastBufferSize))(Keep.both)
+    .toMat(BroadcastHub.sink(bufferSize = mqttSettings.commandBroadcastBufferSize))(Keep.both)
     .run()
-  commands
+  commandQueue
     .watchCompletion()
-    .onComplete(_ => logger.debug(s"[$name] Commands queue completed"))(system.executionContext)
+    .onComplete(_ => logger.debug(s"[$name] Command queue completed"))(system.executionContext)
 
-  // create settings for restarting the MQTT events source
-  val restartingEventsSourceSettings: RestartSettings = RestartSettings(
+  // create settings for restarting the MQTT event source
+  val restartingEventSourceSettings: RestartSettings = RestartSettings(
     minBackoff = mqttSettings.restartMinBackoff,
     maxBackoff = mqttSettings.restartMaxBackoff,
     randomFactor = mqttSettings.restartRandomFactor
@@ -98,25 +98,25 @@ class MqttClient(
   // create the MQTT source that restarts on failure
   // first, the initial commands are sent to the broker
   // then the command broadcast is connected to the MQTT session flow
-  // the MQTT session flow produces MQTT events
-  val restartingEventsSource: Source[Either[MqttCodec.DecodeError, Event[Nothing]], NotUsed] =
-    RestartSource.withBackoff(restartingEventsSourceSettings) { () =>
+  // the MQTT session flow produces MQTT event
+  val restartingEventSource: Source[Either[MqttCodec.DecodeError, Event[Nothing]], NotUsed] =
+    RestartSource.withBackoff(restartingEventSourceSettings) { () =>
       Source(initialCommands)
-        .concatMat(commandsBroadcast)(Keep.right)
+        .concatMat(commandQueueBroadcast)(Keep.right)
         .via(sessionFlow)
         .wireTap(event => logger.debug(s"[$name] Received event $event"))
     }
-  // create `eventsBroadcast` that broadcasts the MQTT events
+  // create `eventBroadcast` that broadcasts the MQTT events
   // and a kill switch that can be used to stop the MQTT session flow
   // `bufferSize` is not that important as a consumer (with `Sink.ignore`) is created immediately
-  val (eventsBroadcastKillSwitch, eventsBroadcast) = {
-    restartingEventsSource
+  val (eventBroadcastKillSwitch, eventBroadcast) = {
+    restartingEventSource
       .viaMat(KillSwitches.single)(Keep.right)
-      .toMat(BroadcastHub.sink(bufferSize = mqttSettings.eventsBroadcastBufferSize))(Keep.both)
+      .toMat(BroadcastHub.sink(bufferSize = mqttSettings.eventBroadcastBufferSize))(Keep.both)
       .run()
   }
-  val eventsBroadcastFuture: Future[Done] = eventsBroadcast.runWith(Sink.ignore)
-  eventsBroadcastFuture.onComplete(_ => logger.debug(s"[$name] Events broadcast shutdown"))(
+  val eventBroadcastFuture: Future[Done] = eventBroadcast.runWith(Sink.ignore)
+  eventBroadcastFuture.onComplete(_ => logger.debug(s"[$name] Event broadcast shutdown"))(
     system.executionContext
   )
 
@@ -140,14 +140,14 @@ class MqttClient(
   /** Shutdown the client
     *
     * @return
-    *   a future that completes after stopping the MQTT session, closing the publish sink, and
-    *   closing the command queue
+    *   a future that completes after closing the command queue, closing the publish sink, and
+    *   stopping the MQTT session
     */
   def shutdown(): Future[Done] = {
-    commands.complete()
+    commandQueue.complete()
     publishSinkKillSwitch.shutdown()
-    eventsBroadcastKillSwitch.shutdown()
-    Future.reduceLeft(Seq(commands.watchCompletion(), publishSinkFuture, eventsBroadcastFuture))(
+    eventBroadcastKillSwitch.shutdown()
+    Future.reduceLeft(Seq(commandQueue.watchCompletion(), publishSinkFuture, eventBroadcastFuture))(
       (_, _) => Done
     )(
       system.executionContext
