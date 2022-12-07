@@ -129,9 +129,9 @@ class MqttClient(
     }
 
   // helper broadcast source that collects only MQTT publish events
-  val publishEventBroadcastSource: Source[(ByteString, String), NotUsed] = eventBroadcastSource
+  val publishEventBroadcastSource: Source[MqttReceivedMessage, NotUsed] = eventBroadcastSource
     .collect { case Right(Event(p: Publish, _)) =>
-      (p.payload, p.topicName)
+      MqttReceivedMessage(p.payload, p.topicName)
     }
 
   // create a publish sink (a merge hub) that publishes messages to the MQTT broker
