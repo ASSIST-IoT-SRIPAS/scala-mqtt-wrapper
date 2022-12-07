@@ -4,11 +4,17 @@ ThisBuild / homepage := Some(url("https://github.com/ASSIST-IoT-SRIPAS/scala-mqt
 ThisBuild / licenses := List("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0"))
 ThisBuild / developers := List(
   Developer(
-    "madpeh", "Przemysław Hołda", "pholda@ibspan.waw.pl", url("https://github.com/madpeh")
+    "madpeh",
+    "Przemysław Hołda",
+    "pholda@ibspan.waw.pl",
+    url("https://github.com/madpeh"),
   ),
   Developer(
-    "Ostrzyciel", "Piotr Sowiński", "psowinski@ibspan.waw.pl", url("https://github.com/Ostrzyciel")
-  )
+    "Ostrzyciel",
+    "Piotr Sowiński",
+    "psowinski@ibspan.waw.pl",
+    url("https://github.com/Ostrzyciel"),
+  ),
 )
 
 sonatypeCredentialHost := "s01.oss.sonatype.org"
@@ -48,7 +54,7 @@ lazy val root = (project in file("."))
       "com.typesafe.scala-logging" %% "scala-logging" % scalaLoggingVersion,
       "org.scalatest" %% "scalatest" % scalaTestVersion % Test,
       "com.typesafe.akka" %% "akka-actor-testkit-typed" % akkaVersion % Test,
-      "org.scalatestplus" %% "scalacheck-1-16" % scalaTestPlusScalaCheck % Test
+      "org.scalatestplus" %% "scalacheck-1-16" % scalaTestPlusScalaCheck % Test,
     ),
     scalacOptions ++= Seq(
       "-encoding",
@@ -60,6 +66,6 @@ lazy val root = (project in file("."))
       "-Ywarn-dead-code",
       "-Ywarn-numeric-widen",
       "-Ywarn-value-discard",
-      "-Ywarn-unused"
+      "-Ywarn-unused",
     ),
   )
