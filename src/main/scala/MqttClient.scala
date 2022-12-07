@@ -115,6 +115,7 @@ class MqttClient(
       .toMat(BroadcastHub.sink(bufferSize = mqttSettings.eventBroadcastBufferSize))(Keep.both)
       .run()
   }
+  // this consumer ensures that the event broadcast does not apply backpressure
   val eventBroadcastFuture: Future[Done] = eventBroadcast.runWith(Sink.ignore)
   eventBroadcastFuture.onComplete(_ => logger.debug(s"[$name] Event broadcast shutdown"))(
     system.executionContext
