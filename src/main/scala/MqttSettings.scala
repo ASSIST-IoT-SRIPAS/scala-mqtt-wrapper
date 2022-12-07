@@ -41,6 +41,10 @@ import utils.Uuid.generateUuid
   *   MQTT commands broadcast buffer size, must be a power of 2
   * @param eventBroadcastBufferSize
   *   MQTT events broadcast buffer size, must be a power of 2
+  * @param withEventBroadcastBackpressure
+  *   if true, the event broadcast will store events in a buffer until there is demand and
+  *   eventually apply backpressure on the MQTT session flow; if false, the events will be always
+  *   consumed even if there is no external demand
   * @param publishSinkPerProducerBufferSize
   *   buffer space used per producer for publish sink
   */
@@ -60,5 +64,6 @@ final case class MqttSettings(
     restartLogLevel: Logging.LogLevel = Logging.WarningLevel,
     commandBroadcastBufferSize: Int = 128,
     eventBroadcastBufferSize: Int = 128,
+    withEventBroadcastBackpressure: Boolean = false,
     publishSinkPerProducerBufferSize: Int = 32
 )

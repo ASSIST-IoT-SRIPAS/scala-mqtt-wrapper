@@ -108,18 +108,26 @@ class MqttClient(
     }
   // create `eventBroadcast` that broadcasts the MQTT events
   // and a kill switch that can be used to stop the MQTT session flow
-  // `bufferSize` is not that important as a consumer (with `Sink.ignore`) is created immediately
+  // `bufferSize` is not that important in case a consumer (with `Sink.ignore`) is created
   val (eventBroadcastKillSwitch, eventBroadcast) = {
     restartingEventSource
       .viaMat(KillSwitches.single)(Keep.right)
       .toMat(BroadcastHub.sink(bufferSize = mqttSettings.eventBroadcastBufferSize))(Keep.both)
       .run()
   }
-  // this consumer ensures that the event broadcast does not apply backpressure
-  val eventBroadcastFuture: Future[Done] = eventBroadcast.runWith(Sink.ignore)
-  eventBroadcastFuture.onComplete(_ => logger.debug(s"[$name] Event broadcast shutdown"))(
-    system.executionContext
-  )
+  val eventBroadcastConsumerFuture: Option[Future[Done]] =
+    if (!mqttSettings.withEventBroadcastBackpressure) {
+      // this consumer ensures that the event broadcast does not apply backpressure
+      // on the session flow after reaching the event broadcast buffer size
+      val future: Future[Done] = eventBroadcast.runWith(Sink.ignore)
+      future.onComplete(_ => logger.debug(s"[$name] Event broadcast consumer shutdown"))(
+        system.executionContext
+      )
+      Some(future)
+    } else {
+      None
+    }
+
   // helper broadcast that collects only MQTT publish events
   val publishEventBroadcast: Source[(ByteString, String), NotUsed] = eventBroadcast
     .collect { case Right(Event(p: Publish, _)) =>
@@ -153,9 +161,13 @@ class MqttClient(
     commandQueue.complete()
     publishSinkKillSwitch.shutdown()
     eventBroadcastKillSwitch.shutdown()
-    Future.reduceLeft(Seq(commandQueue.watchCompletion(), publishSinkFuture, eventBroadcastFuture))(
-      (_, _) => Done
-    )(
+    val eventBroadcastConsumerFutureDone: Future[Done] = eventBroadcastConsumerFuture match {
+      case Some(future) => future
+      case None         => Future.successful(Done)
+    }
+    Future.reduceLeft(
+      Seq(commandQueue.watchCompletion(), publishSinkFuture, eventBroadcastConsumerFutureDone)
+    )((_, _) => Done)(
       system.executionContext
     )
   }
