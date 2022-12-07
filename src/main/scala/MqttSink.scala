@@ -1,10 +1,8 @@
 package pl.waw.ibspan.scala_mqtt_wrapper
 
 import akka.NotUsed
-import akka.stream.alpakka.mqtt.streaming.ControlPacketFlags
 import akka.stream.scaladsl.Flow
 import akka.stream.scaladsl.Sink
-import akka.util.ByteString
 import com.typesafe.scalalogging.LazyLogging
 
 object MqttSink extends LazyLogging {
