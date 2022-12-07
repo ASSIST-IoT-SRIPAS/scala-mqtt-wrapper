@@ -3,7 +3,7 @@ package pl.waw.ibspan.scala_mqtt_wrapper
 import akka.stream.alpakka.mqtt.streaming.ControlPacketFlags
 import akka.util.ByteString
 
-/** MQTT publish message
+/** MQTT data to be published
   *
   * @param message
   *   message to be published
