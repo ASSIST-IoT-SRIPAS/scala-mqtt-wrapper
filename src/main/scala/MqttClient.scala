@@ -73,19 +73,17 @@ class MqttClient(
     mqttSettings.topics.map(topic => Command[Nothing](Subscribe(topic.name))).toList
   val initialCommands: List[Command[Nothing]] = connectCommand :: subscribeCommands
 
-  // create a queue that accepts client commands
-  // note that the commands sent to the queue are not persisted between restarts
-  // `commandQueueBroadcast` broadcasts the queue commands
-  val (commandQueue, commandQueueBroadcast) = Source
-    .queue[Command[Nothing]](
-      bufferSize = mqttSettings.commandBroadcastBufferSize,
-      overflowStrategy = OverflowStrategy.backpressure
-    )
+  // create a command merge sink that accepts client commands
+  // note that the commands sent to the sink are not persisted between restarts
+  // received commands are broadcast via command broadcast hub
+  // the kill switch is used to stop the merge-broadcast stream
+  // while deciding on the buffer sizes note that there is at least one broadcast consumer
+  // (while the MQTT session flow is running; i.e. it is not restarting)
+  val ((commandSink, commandSinkKillSwitch), commandBroadcast) = MergeHub
+    .source[Command[Nothing]](perProducerBufferSize = mqttSettings.commandSinkPerProducerBufferSize)
+    .viaMat(KillSwitches.single)(Keep.both)
     .toMat(BroadcastHub.sink(bufferSize = mqttSettings.commandBroadcastBufferSize))(Keep.both)
     .run()
-  commandQueue
-    .watchCompletion()
-    .onComplete(_ => logger.debug(s"[$name] Command queue completed"))(system.executionContext)
 
   // create settings for restarting the MQTT event source
   val restartingEventSourceSettings: RestartSettings = RestartSettings(
@@ -103,7 +101,7 @@ class MqttClient(
   val restartingEventSource: Source[Either[MqttCodec.DecodeError, Event[Nothing]], NotUsed] =
     RestartSource.withBackoff(restartingEventSourceSettings) { () =>
       Source(initialCommands)
-        .concatMat(commandQueueBroadcast)(Keep.right)
+        .concatMat(commandBroadcast)(Keep.right)
         .via(sessionFlow)
         .wireTap(event => logger.debug(s"[$name] Received event $event"))
     }
@@ -160,16 +158,14 @@ class MqttClient(
     *   stopping the MQTT session
     */
   def shutdown(): Future[Done] = {
-    commandQueue.complete()
+    commandSinkKillSwitch.shutdown()
     publishSinkKillSwitch.shutdown()
     eventBroadcastKillSwitch.shutdown()
     val eventBroadcastConsumerFutureDone: Future[Done] = eventBroadcastConsumerFuture match {
       case Some(future) => future
       case None         => Future.successful(Done)
     }
-    Future.reduceLeft(
-      Seq(commandQueue.watchCompletion(), publishSinkFuture, eventBroadcastConsumerFutureDone)
-    )((_, _) => Done)(
+    Future.reduceLeft(Seq(publishSinkFuture, eventBroadcastConsumerFutureDone))((_, _) => Done)(
       system.executionContext
     )
   }
