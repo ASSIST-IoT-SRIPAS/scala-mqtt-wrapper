@@ -4,7 +4,6 @@ import akka.Done
 import akka.NotUsed
 import akka.actor.typed.ActorSystem
 import akka.stream.KillSwitches
-import akka.stream.OverflowStrategy
 import akka.stream.RestartSettings
 import akka.stream.alpakka.mqtt.streaming.Command
 import akka.stream.alpakka.mqtt.streaming.Connect
