@@ -1,0 +1,48 @@
+version: '3.9'
+
+services:
+  app:
+    build:
+      args:
+        - JAVA_VERSION=17.0.4-tem
+        - SBT_VERSION=1.8.0
+        - SCALA_VERSION=2.13.10
+      context: ../..
+      dockerfile: ./dev/app/Dockerfile
+    container_name: smw-app-dev
+    networks:
+      - smw-app-mosquitto-net
+    volumes:
+      - swm-app-ivy2-data:/root/.ivy2
+      - swm-app-sbt-data:/root/.sbt
+      - ../../src:/app/src
+
+  mosquitto:
+    build: ./dev/mqtt/mosquitto
+    container_name: smw-mosquitto-dev
+    networks:
+      - smw-app-mosquitto-net
+      - swm-mosquitto-explorer-net
+    ports:
+      - "1883:1883"
+
+  mqtt-explorer:
+    container_name: swm-mqtt-explorer-dev
+    environment:
+      - HTTP_PORT=4000
+    image: smeagolworms4/mqtt-explorer:browser-1.0.1
+    networks:
+      - swm-mosquitto-explorer-net
+    ports:
+      - "4000:4000"
+    volumes:
+      - swm-mqtt-explorer-data:/mqtt-explorer/config
+
+networks:
+  smw-app-mosquitto-net:
+  swm-mosquitto-explorer-net:
+
+volumes:
+  swm-app-ivy2-data:
+  swm-app-sbt-data:
+  swm-mqtt-explorer-data:
