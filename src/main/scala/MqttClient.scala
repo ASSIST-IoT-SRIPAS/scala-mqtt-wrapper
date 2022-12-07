@@ -106,20 +106,20 @@ class MqttClient(
         .wireTap(event => logger.debug(s"[$name] Received event $event"))
     }
 
-  // create `eventBroadcast` that broadcasts the MQTT events
-  // and a kill switch that can be used to stop the MQTT session flow
-  // `bufferSize` is not that important in case a consumer (with `Sink.ignore`) is created
-  val (eventBroadcastKillSwitch, eventBroadcast) = {
+  // create event broadcast source that broadcasts the MQTT events
+  // the kill switch is used to stop the MQTT session flow
+  // the buffer size is not that important in case a consumer (with `Sink.ignore`) is created
+  val (eventBroadcastSourceKillSwitch, eventBroadcastSource) = {
     restartingEventSource
       .viaMat(KillSwitches.single)(Keep.right)
-      .toMat(BroadcastHub.sink(bufferSize = mqttSettings.eventBroadcastBufferSize))(Keep.both)
+      .toMat(BroadcastHub.sink(bufferSize = mqttSettings.eventBroadcastSourceBufferSize))(Keep.both)
       .run()
   }
   val eventBroadcastConsumerFuture: Option[Future[Done]] =
-    if (!mqttSettings.withEventBroadcastBackpressure) {
+    if (!mqttSettings.withEventBroadcastSourceBackpressure) {
       // this consumer ensures that the event broadcast does not apply backpressure
       // on the session flow after reaching the event broadcast buffer size
-      val future: Future[Done] = eventBroadcast.runWith(Sink.ignore)
+      val future: Future[Done] = eventBroadcastSource.runWith(Sink.ignore)
       future.onComplete(_ => logger.debug(s"[$name] Event broadcast consumer shutdown"))(
         system.executionContext
       )
@@ -129,7 +129,7 @@ class MqttClient(
     }
 
   // helper broadcast that collects only MQTT publish events
-  val publishEventBroadcast: Source[(ByteString, String), NotUsed] = eventBroadcast
+  val publishEventBroadcast: Source[(ByteString, String), NotUsed] = eventBroadcastSource
     .collect { case Right(Event(p: Publish, _)) =>
       (p.payload, p.topicName)
     }
@@ -160,7 +160,7 @@ class MqttClient(
   def shutdown(): Future[Done] = {
     commandMergeSinkKillSwitch.shutdown()
     publishSinkKillSwitch.shutdown()
-    eventBroadcastKillSwitch.shutdown()
+    eventBroadcastSourceKillSwitch.shutdown()
     val eventBroadcastConsumerFutureDone: Future[Done] = eventBroadcastConsumerFuture match {
       case Some(future) => future
       case None         => Future.successful(Done)

@@ -41,9 +41,9 @@ import utils.Uuid.generateUuid
   *   buffer space used per producer for command sink merge hub
   * @param commandBroadcastSourceBufferSize
   *   MQTT commands broadcast buffer size, must be a power of 2
-  * @param eventBroadcastBufferSize
+  * @param eventBroadcastSourceBufferSize
   *   MQTT events broadcast buffer size, must be a power of 2
-  * @param withEventBroadcastBackpressure
+  * @param withEventBroadcastSourceBackpressure
   *   if true, the event broadcast will store events in a buffer until there is demand and
   *   eventually apply backpressure on the MQTT session flow; if false, the events will be always
   *   consumed even if there is no external demand
@@ -66,7 +66,7 @@ final case class MqttSettings(
     restartLogLevel: Logging.LogLevel = Logging.WarningLevel,
     commandMergeSinkPerProducerBufferSize: Int = 16,
     commandBroadcastSourceBufferSize: Int = 128,
-    eventBroadcastBufferSize: Int = 128,
-    withEventBroadcastBackpressure: Boolean = false,
+    eventBroadcastSourceBufferSize: Int = 128,
+    withEventBroadcastSourceBackpressure: Boolean = false,
     publishSinkPerProducerBufferSize: Int = 32
 )
