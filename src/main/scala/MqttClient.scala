@@ -119,6 +119,11 @@ class MqttClient(
   eventBroadcastFuture.onComplete(_ => logger.debug(s"[$name] Event broadcast shutdown"))(
     system.executionContext
   )
+  // helper broadcast that collects only MQTT publish events
+  val publishEventBroadcast: Source[(ByteString, String), NotUsed] = eventBroadcast
+    .collect { case Right(Event(p: Publish, _)) =>
+      (p.payload, p.topicName)
+    }
 
   // create a publish sink (a merge hub) that publishes messages to the MQTT broker
   // a kill switch is used to kill the merge hub
