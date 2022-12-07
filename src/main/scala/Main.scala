@@ -64,7 +64,7 @@ object Main {
 
     Source
       .single(Command[Nothing](Subscribe("test")))
-      .runWith(sourceClient.commandSink)
+      .runWith(sourceClient.commandMergeSink)
 
     Thread.sleep(60000)
     sourceClient.shutdown()

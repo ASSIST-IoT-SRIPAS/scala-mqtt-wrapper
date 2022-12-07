@@ -79,7 +79,7 @@ source
 // send a command to the client to subscribe to the "test" topic
 Source
   .single(Command[Nothing](Subscribe("test")))
-  .runWith(sourceClient.commandSink)
+  .runWith(sourceClient.commandMergeSink)
 
 // after some time, shutdown the clients
 Thread.sleep(60000)

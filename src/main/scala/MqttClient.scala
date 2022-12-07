@@ -79,8 +79,8 @@ class MqttClient(
   // the kill switch is used to stop the merge-broadcast stream
   // while deciding on the buffer sizes note that there is at least one broadcast consumer
   // (while the MQTT session flow is running; i.e. it is not restarting)
-  val ((commandSink, commandSinkKillSwitch), commandBroadcast) = MergeHub
-    .source[Command[Nothing]](perProducerBufferSize = mqttSettings.commandSinkPerProducerBufferSize)
+  val ((commandMergeSink, commandMergeSinkKillSwitch), commandBroadcast) = MergeHub
+    .source[Command[Nothing]](perProducerBufferSize = mqttSettings.commandMergeSinkPerProducerBufferSize)
     .viaMat(KillSwitches.single)(Keep.both)
     .toMat(BroadcastHub.sink(bufferSize = mqttSettings.commandBroadcastBufferSize))(Keep.both)
     .run()
@@ -158,7 +158,7 @@ class MqttClient(
     *   stopping the MQTT session
     */
   def shutdown(): Future[Done] = {
-    commandSinkKillSwitch.shutdown()
+    commandMergeSinkKillSwitch.shutdown()
     publishSinkKillSwitch.shutdown()
     eventBroadcastKillSwitch.shutdown()
     val eventBroadcastConsumerFutureDone: Future[Done] = eventBroadcastConsumerFuture match {
