@@ -9,6 +9,16 @@ import akka.util.ByteString
 import com.typesafe.scalalogging.LazyLogging
 
 object MqttSource extends LazyLogging {
+
+  /** Create MQTT source
+    *
+    * Source consumes messages from the MQTT broker from subscribed topics
+    *
+    * @param mqttClient
+    *   MQTT client
+    * @param system
+    *   actor system
+    */
   def source(mqttClient: MqttClient)(implicit
       system: ActorSystem[_]
   ): Source[(ByteString, String), NotUsed] = mqttClient.eventsBroadcast

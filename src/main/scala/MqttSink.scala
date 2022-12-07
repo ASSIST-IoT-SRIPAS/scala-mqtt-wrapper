@@ -11,6 +11,16 @@ import akka.util.ByteString
 import com.typesafe.scalalogging.LazyLogging
 
 object MqttSink extends LazyLogging {
+
+  /** Create MQTT sink
+    *
+    * Sink publishes consumed messages to the MQTT broker
+    *
+    * @param mqttClient
+    *   MQTT client
+    * @param system
+    *   actor system
+    */
   def sink(
       mqttClient: MqttClient
   )(implicit system: ActorSystem[_]): Sink[(ByteString, String, ControlPacketFlags), NotUsed] =

@@ -9,6 +9,39 @@ import scala.concurrent.duration.FiniteDuration
 
 import utils.Uuid.generateUuid
 
+/** MQTT client settings
+  *
+  * @param host
+  *   MQTT host
+  * @param port
+  *   MQTT port
+  * @param username
+  *   MQTT username
+  * @param password
+  *   MQTT password
+  * @param topics
+  *   MQTT topics to subscribe to
+  * @param clientId
+  *   MQTT client ID
+  * @param sessionId
+  *   MQTT session ID
+  * @param connectFlags
+  *   MQTT connect flags
+  * @param restartMinBackoff
+  *   MQTT restart minimum backoff
+  * @param restartMaxBackoff
+  *   MQTT restart maximum backoff
+  * @param restartRandomFactor
+  *   MQTT restart random factor, random delay is added based on this factor
+  * @param maxRestarts
+  *   MQTT maximum restarts, set to -1 for infinite restarts
+  * @param restartLogLevel
+  *   MQTT restart log level
+  * @param commandsBroadcastBufferSize
+  *   MQTT commands broadcast buffer size, must be a power of 2
+  * @param eventsBroadcastBufferSize
+  *   MQTT events broadcast buffer size, must be a power of 2
+  */
 final case class MqttSettings(
     host: String,
     port: Int,
