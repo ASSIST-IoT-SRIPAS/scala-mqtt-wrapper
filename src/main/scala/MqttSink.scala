@@ -21,8 +21,8 @@ object MqttSink extends LazyLogging {
       // TODO: use .log() instead
       .wireTap(data =>
         logger.debug(
-          "[%s] Sending message [%s] to topic [%s]"
-            .format(mqttClient.name, data.message.utf8String, data.topic)
+          "[%s] Sending payload [%s] to topic [%s]"
+            .format(mqttClient.name, data.payload.utf8String, data.topic)
         )
       )
       .to(mqttClient.publishMergeSink)

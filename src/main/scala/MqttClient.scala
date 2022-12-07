@@ -142,8 +142,8 @@ class MqttClient(
       mqttSettings.publishMergeSinkPerProducerBufferSize
     )
     .viaMat(KillSwitches.single)(Keep.both)
-    .map { case MqttPublishMessage(message, topic, publishFlags) =>
-      session ! Command[Nothing](Publish(publishFlags, topic, message))
+    .map { case MqttPublishMessage(payload, topic, publishFlags) =>
+      session ! Command[Nothing](Publish(publishFlags, topic, payload))
     }
     .toMat(Sink.ignore)(Keep.both)
     .run()

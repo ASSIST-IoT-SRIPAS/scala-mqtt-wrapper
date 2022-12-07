@@ -5,15 +5,15 @@ import akka.util.ByteString
 
 /** MQTT data to be published
   *
-  * @param message
-  *   message to be published
+  * @param payload
+  *   payload to be published
   * @param topic
-  *   topic to which the message will be published
+  *   topic to which the payload will be published
   * @param publishFlags
   *   MQTT publish flags
   */
 final case class MqttPublishMessage(
-    message: ByteString,
+    payload: ByteString,
     topic: String,
     publishFlags: ControlPacketFlags = ControlPacketFlags.None,
 )

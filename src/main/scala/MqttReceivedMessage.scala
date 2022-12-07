@@ -3,12 +3,12 @@ package pl.waw.ibspan.scala_mqtt_wrapper
 import akka.util.ByteString
 
 /** data received from the MQTT broker
-  * @param message
-  *   received message
+  * @param payload
+  *   received payload
   * @param topic
-  *   topic from which the message was received
+  *   topic from which the payload was received
   */
 final case class MqttReceivedMessage(
-    message: ByteString,
+    payload: ByteString,
     topic: String,
 )

@@ -19,8 +19,8 @@ object MqttSource extends LazyLogging {
       // TODO: use .log() instead
       .wireTap(data =>
         logger.debug(
-          "[%s] Received message [%s] from topic [%s]"
-            .format(mqttClient.name, data.message.utf8String, data.topic)
+          "[%s] Received payload [%s] from topic [%s]"
+            .format(mqttClient.name, data.payload.utf8String, data.topic)
         )
       )
 }
