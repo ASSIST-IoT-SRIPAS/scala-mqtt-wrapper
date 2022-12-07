@@ -65,5 +65,5 @@ final case class MqttSettings(
     commandBroadcastBufferSize: Int = 128,
     eventBroadcastBufferSize: Int = 128,
     withEventBroadcastBackpressure: Boolean = false,
-    publishSinkPerProducerBufferSize: Int = 32
+    publishSinkPerProducerBufferSize: Int = 32,
 )

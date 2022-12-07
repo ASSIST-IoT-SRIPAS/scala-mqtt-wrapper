@@ -11,12 +11,7 @@ object Main {
     import akka.stream.scaladsl.Flow
     import akka.util.ByteString
     import akka.stream.alpakka.mqtt.streaming.ControlPacketFlags
-    import akka.stream.scaladsl.Sink
-    import akka.stream.scaladsl.Source
     import akka.stream.alpakka.mqtt.streaming.Command
-    import akka.stream.alpakka.mqtt.streaming.Publish
-    import akka.stream.KillSwitches
-    import akka.stream.scaladsl.Keep
     import scala.concurrent.ExecutionContextExecutor
     import akka.stream.alpakka.mqtt.streaming.Subscribe
 

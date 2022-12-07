@@ -3,6 +3,6 @@ package utils
 
 import java.util.UUID
 
-object Uuid {
+private[scala_mqtt_wrapper] object Uuid {
   def generateUuid: UUID = java.util.UUID.randomUUID
 }

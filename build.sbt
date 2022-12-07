@@ -1,6 +1,18 @@
-ThisBuild / version := "1.0.0-rc0"
 ThisBuild / scalaVersion := "2.13.10"
-ThisBuild / organization := "pl.waw.ibspan"
+ThisBuild / organization := "io.github.assist-iot-sripas"
+ThisBuild / homepage := Some(url("https://github.com/ASSIST-IoT-SRIPAS/scala-mqtt-wrapper/"))
+ThisBuild / licenses := List("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0"))
+ThisBuild / developers := List(
+  Developer(
+    "madpeh", "Przemysław Hołda", "pholda@ibspan.waw.pl", url("https://github.com/madpeh")
+  ),
+  Developer(
+    "Ostrzyciel", "Piotr Sowiński", "psowinski@ibspan.waw.pl", url("https://github.com/Ostrzyciel")
+  )
+)
+
+sonatypeCredentialHost := "s01.oss.sonatype.org"
+sonatypeRepository := "https://s01.oss.sonatype.org/service/local"
 
 ThisBuild / scalafmtConfig := file("dev/configs/scalafmt.conf")
 
@@ -49,5 +61,5 @@ lazy val root = (project in file("."))
       "-Ywarn-numeric-widen",
       "-Ywarn-value-discard",
       "-Ywarn-unused"
-    )
+    ),
   )
