@@ -154,9 +154,12 @@ class MqttClient(
 
   /** Shutdown the client
     *
+    * Shutdowns command merge sink / command broadcast source, publish merge sink, and event
+    * broadcast source (along with the MQTT session)
+    *
     * @return
-    *   a future that completes after closing the command queue, closing the publish sink, and
-    *   stopping the MQTT session
+    *   a future that completes after closing publish merge sink, and the (optional) event broadcast
+    *   consumer (if option withEventBroadcastSourceBackpressure is false)
     */
   def shutdown(): Future[Done] = {
     commandMergeSinkKillSwitch.shutdown()
