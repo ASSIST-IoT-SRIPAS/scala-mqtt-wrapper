@@ -16,6 +16,7 @@ Currently, the supported Scala version is `2.13.10`.
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
 import akka.stream.scaladsl.Flow
+import akka.stream.scaladsl.Source
 import akka.util.ByteString
 import akka.stream.alpakka.mqtt.streaming.ControlPacketFlags
 import akka.stream.alpakka.mqtt.streaming.Command
@@ -75,8 +76,10 @@ source
   .via(uppercaseFlow)
   .runWith(sink)
 
-// send a command to the client to subscribe to "testTopic"
-sourceClient.commandQueue.offer(Command[Nothing](Subscribe("testTopic")))
+// send a command to the client to subscribe to the "test" topic
+Source
+  .single(Command[Nothing](Subscribe("test")))
+  .runWith(sourceClient.commandSink)
 
 // after some time, shutdown the clients
 Thread.sleep(60000)
