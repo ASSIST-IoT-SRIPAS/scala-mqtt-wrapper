@@ -16,6 +16,8 @@ Currently, the supported Scala version is `2.13.10`.
 
 ## Documentation <a name = "documentation" />
 - [MqttClient](src/main/scala/MqttClient.scala)
+- [MqttPublishMessage](src/main/scala/MqttPublishMessage.scala)
+- [MqttReceivedMessage](src/main/scala/MqttReceivedMessage.scala)
 - [MqttSettings](src/main/scala/MqttSettings.scala)
 - [MqttSink](src/main/scala/MqttSink.scala)
 - [MqttSource](src/main/scala/MqttSource.scala)
