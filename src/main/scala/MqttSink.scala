@@ -3,9 +3,8 @@ package pl.waw.ibspan.scala_mqtt_wrapper
 import akka.NotUsed
 import akka.stream.scaladsl.Flow
 import akka.stream.scaladsl.Sink
-import com.typesafe.scalalogging.LazyLogging
 
-object MqttSink extends LazyLogging {
+object MqttSink {
 
   /** Create MQTT sink
     *
@@ -13,15 +12,22 @@ object MqttSink extends LazyLogging {
     *
     * @param mqttClient
     *   MQTT client
+    * @param loggingSettings
+    *   optional logging settings
     */
-  def sink(mqttClient: MqttClient): Sink[MqttPublishMessage, NotUsed] =
-    Flow[MqttPublishMessage]
-      // TODO: use .log() instead
-      .wireTap(data =>
-        logger.debug(
-          "[%s] Sending payload [%s] to topic [%s]"
-            .format(mqttClient.name, data.payload.utf8String, data.topic)
+  def sink(
+      mqttClient: MqttClient,
+      loggingSettings: Option[MqttLoggingSettings] = None,
+  ): Sink[MqttPublishMessage, NotUsed] = {
+    loggingSettings.fold(mqttClient.publishMergeSink) { settings =>
+      val name = s"${mqttClient.name} : ${settings.name}"
+      Flow[MqttPublishMessage]
+        .log(
+          name,
+          data => s"payload [${data.payload.utf8String}] to topic [${data.topic}]",
         )
-      )
-      .to(mqttClient.publishMergeSink)
+        .addAttributes(settings.attributes)
+        .to(mqttClient.publishMergeSink)
+    }
+  }
 }
