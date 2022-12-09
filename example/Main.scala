@@ -2,6 +2,7 @@ package pl.waw.ibspan.scala_mqtt_wrapper
 
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
+import akka.stream.Attributes
 import akka.stream.alpakka.mqtt.streaming.Command
 import akka.stream.alpakka.mqtt.streaming.ControlPacketFlags
 import akka.stream.alpakka.mqtt.streaming.Subscribe
@@ -19,6 +20,13 @@ object Main {
       name = "scalaMqttWrapper",
     )
 
+    // create shared logging attributes
+    val loggingAttributes = Attributes.logLevels(
+      onElement = Attributes.LogLevels.Info,
+      onFinish = Attributes.LogLevels.Info,
+      onFailure = Attributes.LogLevels.Error,
+    )
+
     // create a client connected to an MQTT broker
     // and subscribe to one topic ("input")
     val sourceClient = new MqttClient(
@@ -27,10 +35,16 @@ object Main {
         port = 1883,
         topics = Seq(MqttTopic("input")),
       ),
-      name = "sourceClient",
+      loggingSettings = Some(
+        MqttLoggingSettings(name = "sourceClient", attributes = loggingAttributes)
+      ),
     )
+
     // create a source emitting messages from subscribed topics
-    val source = MqttSource.source(sourceClient)
+    val source = MqttSource.source(
+      sourceClient,
+      loggingSettings = Some(MqttLoggingSettings(name = "source", attributes = loggingAttributes)),
+    )
 
     // create a client connected to the same MQTT broker
     val sinkClient = new MqttClient(
@@ -38,10 +52,16 @@ object Main {
         host = "mosquitto",
         port = 1883,
       ),
-      name = "sinkClient",
+      loggingSettings = Some(
+        MqttLoggingSettings(name = "sinkClient", attributes = loggingAttributes)
+      ),
     )
+
     // create a sink to publish messages
-    val sink = MqttSink.sink(sinkClient)
+    val sink = MqttSink.sink(
+      sinkClient,
+      loggingSettings = Some(MqttLoggingSettings(name = "sink", attributes = loggingAttributes)),
+    )
 
     // create a flow that converts the incoming messages to uppercase
     // and publishes them to the "output" topic
@@ -49,9 +69,6 @@ object Main {
       val outputPayload = ByteString(payload.utf8String.toUpperCase)
       val outputTopic = "output"
       val publishFlags = ControlPacketFlags.QoSAtLeastOnceDelivery | ControlPacketFlags.RETAIN
-      println(
-        s"source [$topic] ${payload.utf8String} --> sink [$outputTopic] ${outputPayload.utf8String}"
-      )
       MqttPublishMessage(outputPayload, outputTopic, publishFlags)
     }
 
