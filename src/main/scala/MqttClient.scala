@@ -35,17 +35,20 @@ import scala.concurrent.Future
   *   MQTT client settings
   * @param mqttSessionSettings
   *   MQTT session settings
-  * @param name
-  *   MQTT client name used for logging
+  * @param loggingSettings
+  *   optional logging settings
   * @param system
   *   actor system
   */
 class MqttClient(
     val mqttSettings: MqttSettings,
     val mqttSessionSettings: MqttSessionSettings = MqttSessionSettings(),
-    val name: String = "",
+    val loggingSettings: Option[MqttLoggingSettings] = None,
 )(implicit system: ActorSystem[_])
     extends LazyLogging {
+  // name used for logging
+  val name: String = loggingSettings.fold("")(_.name)
+
   // prepare MQTT client session
   val session: ActorMqttClientSession = ActorMqttClientSession(mqttSessionSettings)
   val tcpConnection: Flow[ByteString, ByteString, Future[Tcp.OutgoingConnection]] =
@@ -100,10 +103,12 @@ class MqttClient(
   // the MQTT session flow produces MQTT event
   val restartingEventSource: Source[Either[MqttCodec.DecodeError, Event[Nothing]], NotUsed] =
     RestartSource.withBackoff(restartingEventSourceSettings) { () =>
-      Source(initialCommands)
+      val source = Source(initialCommands)
         .concatMat(commandBroadcastSource)(Keep.right)
         .via(sessionFlow)
-        .wireTap(event => logger.debug(s"[$name] Received event $event"))
+      loggingSettings.fold(source)(settings =>
+        source.log(settings.name, event => s"event [$event]").addAttributes(settings.attributes)
+      )
     }
 
   // create event broadcast source that broadcasts the MQTT events
