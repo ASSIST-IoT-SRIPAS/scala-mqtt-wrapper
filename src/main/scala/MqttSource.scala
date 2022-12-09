@@ -2,10 +2,8 @@ package pl.waw.ibspan.scala_mqtt_wrapper
 
 import akka.NotUsed
 import akka.stream.scaladsl.Source
-import akka.util.ByteString
-import com.typesafe.scalalogging.LazyLogging
 
-object MqttSource extends LazyLogging {
+object MqttSource {
 
   /** Create MQTT source
     *
@@ -13,14 +11,21 @@ object MqttSource extends LazyLogging {
     *
     * @param mqttClient
     *   MQTT client
+    * @param loggingSettings
+    *   optional logging settings
     */
-  def source(mqttClient: MqttClient): Source[MqttReceivedMessage, NotUsed] =
-    mqttClient.publishEventBroadcastSource
-      // TODO: use .log() instead
-      .wireTap(data =>
-        logger.debug(
-          "[%s] Received payload [%s] from topic [%s]"
-            .format(mqttClient.name, data.payload.utf8String, data.topic)
+  def source(
+      mqttClient: MqttClient,
+      loggingSettings: Option[MqttLoggingSettings] = None,
+  ): Source[MqttReceivedMessage, NotUsed] = {
+    loggingSettings.fold(mqttClient.publishEventBroadcastSource) { settings =>
+      val name = s"${mqttClient.name} : ${settings.name}"
+      mqttClient.publishEventBroadcastSource
+        .log(
+          name,
+          data => s"payload [${data.payload.utf8String}] from topic [${data.topic}]",
         )
-      )
+        .addAttributes(settings.attributes)
+    }
+  }
 }
