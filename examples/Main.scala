@@ -33,7 +33,7 @@ object Main {
       MqttSettings(
         host = "mosquitto",
         port = 1883,
-        topics = Seq(MqttTopic("input")),
+        subscriptions = Seq(MqttTopic("input")),
       ),
       loggingSettings = Some(
         MqttLoggingSettings(name = "sourceClient", attributes = loggingAttributes)
