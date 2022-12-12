@@ -70,7 +70,7 @@ class MqttClient(
       )
     )
   val subscribeCommands: List[Command[Nothing]] =
-    mqttSettings.topics.map(topic => Command[Nothing](Subscribe(topic.name))).toList
+    mqttSettings.subscriptions.map(topic => Command[Nothing](Subscribe(topic.name))).toList
   val initialCommands: List[Command[Nothing]] = connectCommand :: subscribeCommands
 
   // create a command merge sink that accepts client commands
