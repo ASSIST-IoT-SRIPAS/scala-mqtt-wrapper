@@ -28,3 +28,5 @@ project/metals.sbt
 slim.report.json
 
 src/main/scala/Main.scala
+
+.sdkmanrc
