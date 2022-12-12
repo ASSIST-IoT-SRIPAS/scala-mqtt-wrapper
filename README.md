@@ -1,5 +1,6 @@
 # Scala MQTT wrapper
 [![scala-mqtt-wrapper Scala version support](https://index.scala-lang.org/assist-iot-sripas/scala-mqtt-wrapper/scala-mqtt-wrapper/latest.svg)](https://index.scala-lang.org/assist-iot-sripas/scala-mqtt-wrapper/scala-mqtt-wrapper)
+[![javadoc](https://javadoc.io/badge2/io.github.assist-iot-sripas/scala-mqtt-wrapper_2.13/javadoc.svg)](https://www.javadoc.io/doc/io.github.assist-iot-sripas/scala-mqtt-wrapper_2.13/latest/pl/waw/ibspan/scala_mqtt_wrapper/index.html)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 ## About <a name = "about" />
@@ -17,14 +18,7 @@ Currently, the supported Scala version is `2.13.10`.
 [Example code](https://github.com/ASSIST-IoT-SRIPAS/scala-mqtt-wrapper/blob/main/examples/Main.scala)
 
 ## Documentation <a name = "documentation" />
-- [MqttClient](https://github.com/ASSIST-IoT-SRIPAS/scala-mqtt-wrapper/blob/main/src/main/scala/MqttClient.scala)
-- [MqttLoggingSettings](https://github.com/ASSIST-IoT-SRIPAS/scala-mqtt-wrapper/blob/main/src/main/scala/MqttLoggingSettings.scala)
-- [MqttPublishMessage](https://github.com/ASSIST-IoT-SRIPAS/scala-mqtt-wrapper/blob/main/src/main/scala/MqttPublishMessage.scala)
-- [MqttReceivedMessage](https://github.com/ASSIST-IoT-SRIPAS/scala-mqtt-wrapper/blob/main/src/main/scala/MqttReceivedMessage.scala)
-- [MqttSettings](https://github.com/ASSIST-IoT-SRIPAS/scala-mqtt-wrapper/blob/main/src/main/scala/MqttSettings.scala)
-- [MqttSink](https://github.com/ASSIST-IoT-SRIPAS/scala-mqtt-wrapper/blob/main/src/main/scala/MqttSink.scala)
-- [MqttSource](https://github.com/ASSIST-IoT-SRIPAS/scala-mqtt-wrapper/blob/main/src/main/scala/MqttSource.scala)
-- [MqttTopic](https://github.com/ASSIST-IoT-SRIPAS/scala-mqtt-wrapper/blob/main/src/main/scala/MqttTopic.scala)
+See [Javadoc for the latest version](https://www.javadoc.io/doc/io.github.assist-iot-sripas/scala-mqtt-wrapper_2.13/latest/pl/waw/ibspan/scala_mqtt_wrapper/index.html).
 
 ## Contributing <a name = "contributing" />
 Please follow the [contributing guide](CONTRIBUTING.md) if you wish to contribute to the project.
