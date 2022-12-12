@@ -14,17 +14,17 @@ Currently, the supported Scala version is `2.13.10`.
 
 ## Examples <a name = "examples" />
 
-[Example code](example/Main.scala)
+[Example code](https://github.com/ASSIST-IoT-SRIPAS/scala-mqtt-wrapper/blob/main/examples/Main.scala)
 
 ## Documentation <a name = "documentation" />
-- [MqttClient](src/main/scala/MqttClient.scala)
-- [MqttLoggingSettings](src/main/scala/MqttLoggingSettings.scala)
-- [MqttPublishMessage](src/main/scala/MqttPublishMessage.scala)
-- [MqttReceivedMessage](src/main/scala/MqttReceivedMessage.scala)
-- [MqttSettings](src/main/scala/MqttSettings.scala)
-- [MqttSink](src/main/scala/MqttSink.scala)
-- [MqttSource](src/main/scala/MqttSource.scala)
-- [MqttTopic](src/main/scala/MqttTopic.scala)
+- [MqttClient](https://github.com/ASSIST-IoT-SRIPAS/scala-mqtt-wrapper/blob/main/src/main/scala/MqttClient.scala)
+- [MqttLoggingSettings](https://github.com/ASSIST-IoT-SRIPAS/scala-mqtt-wrapper/blob/main/src/main/scala/MqttLoggingSettings.scala)
+- [MqttPublishMessage](https://github.com/ASSIST-IoT-SRIPAS/scala-mqtt-wrapper/blob/main/src/main/scala/MqttPublishMessage.scala)
+- [MqttReceivedMessage](https://github.com/ASSIST-IoT-SRIPAS/scala-mqtt-wrapper/blob/main/src/main/scala/MqttReceivedMessage.scala)
+- [MqttSettings](https://github.com/ASSIST-IoT-SRIPAS/scala-mqtt-wrapper/blob/main/src/main/scala/MqttSettings.scala)
+- [MqttSink](https://github.com/ASSIST-IoT-SRIPAS/scala-mqtt-wrapper/blob/main/src/main/scala/MqttSink.scala)
+- [MqttSource](https://github.com/ASSIST-IoT-SRIPAS/scala-mqtt-wrapper/blob/main/src/main/scala/MqttSource.scala)
+- [MqttTopic](https://github.com/ASSIST-IoT-SRIPAS/scala-mqtt-wrapper/blob/main/src/main/scala/MqttTopic.scala)
 
 ## Contributing <a name = "contributing" />
 Please follow the [contributing guide](CONTRIBUTING.md) if you wish to contribute to the project.
