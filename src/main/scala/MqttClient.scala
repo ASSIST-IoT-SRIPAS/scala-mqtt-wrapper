@@ -5,6 +5,7 @@ import akka.NotUsed
 import akka.actor.typed.ActorSystem
 import akka.stream.KillSwitches
 import akka.stream.RestartSettings
+import akka.stream.UniqueKillSwitch
 import akka.stream.alpakka.mqtt.streaming.Command
 import akka.stream.alpakka.mqtt.streaming.Connect
 import akka.stream.alpakka.mqtt.streaming.Event
@@ -23,7 +24,6 @@ import akka.stream.scaladsl.Sink
 import akka.stream.scaladsl.Source
 import akka.stream.scaladsl.Tcp
 import akka.util.ByteString
-import com.typesafe.scalalogging.LazyLogging
 
 import scala.concurrent.Future
 
@@ -44,8 +44,7 @@ class MqttClient(
     val mqttSettings: MqttSettings,
     val mqttSessionSettings: MqttSessionSettings = MqttSessionSettings(),
     val loggingSettings: Option[MqttLoggingSettings] = None,
-)(implicit system: ActorSystem[_])
-    extends LazyLogging {
+)(implicit system: ActorSystem[_]) {
   // name used for logging
   val name: String = loggingSettings.fold("")(_.name)
 
@@ -107,7 +106,9 @@ class MqttClient(
         .concatMat(commandBroadcastSource)(Keep.right)
         .via(sessionFlow)
       loggingSettings.fold(source)(settings =>
-        source.log(settings.name, event => s"event [$event]").addAttributes(settings.attributes)
+        source
+          .log(settings.name + " : (internal) restartingEventSource", event => s"event [$event]")
+          .addAttributes(settings.attributes)
       )
     }
 
@@ -124,11 +125,12 @@ class MqttClient(
     if (!mqttSettings.withEventBroadcastSourceBackpressure) {
       // this consumer ensures that the event broadcast does not apply backpressure
       // on the session flow after reaching the event broadcast buffer size
-      val future: Future[Done] = eventBroadcastSource.runWith(Sink.ignore)
-      future.onComplete(_ => logger.debug(s"[$name] Event broadcast consumer shutdown"))(
-        system.executionContext
+      val source = loggingSettings.fold(eventBroadcastSource)(settings =>
+        eventBroadcastSource
+          .log(settings.name + " : (internal) eventBroadcastConsumer", event => s"event [$event]")
+          .addAttributes(settings.attributes)
       )
-      Some(future)
+      Some(source.runWith(Sink.ignore))
     } else {
       None
     }
@@ -142,19 +144,27 @@ class MqttClient(
   // create a publish sink (a merge hub) that publishes messages to the MQTT broker
   // a kill switch is used to kill the merge hub
   // as it is not stopped when the MQTT session flow is stopped
-  val ((publishMergeSink, publishMergeSinkKillSwitch), publishMergeSinkFuture) = MergeHub
+  val publishMergeSinkSource
+      : Source[MqttPublishMessage, (Sink[MqttPublishMessage, NotUsed], UniqueKillSwitch)] = MergeHub
     .source[MqttPublishMessage](perProducerBufferSize =
       mqttSettings.publishMergeSinkPerProducerBufferSize
     )
     .viaMat(KillSwitches.single)(Keep.both)
-    .map { case MqttPublishMessage(payload, topic, publishFlags) =>
-      session ! Command[Nothing](Publish(publishFlags, topic, payload))
-    }
-    .toMat(Sink.ignore)(Keep.both)
-    .run()
-  publishMergeSinkFuture.onComplete(_ => logger.debug(s"[$name] Publish merge sink shutdown"))(
-    system.executionContext
-  )
+  val publishMergeSinkSourceWithOptionalLogger
+      : Source[MqttPublishMessage, (Sink[MqttPublishMessage, NotUsed], UniqueKillSwitch)] =
+    loggingSettings
+      .fold(publishMergeSinkSource)(settings =>
+        publishMergeSinkSource
+          .log(settings.name + " : (internal) publishMergeSink", event => s"event [$event]")
+          .addAttributes(settings.attributes)
+      )
+  val ((publishMergeSink, publishMergeSinkKillSwitch), publishMergeSinkFuture) =
+    publishMergeSinkSourceWithOptionalLogger
+      .map { case MqttPublishMessage(payload, topic, publishFlags) =>
+        session ! Command[Nothing](Publish(publishFlags, topic, payload))
+      }
+      .toMat(Sink.ignore)(Keep.both)
+      .run()
 
   /** Shutdown the client
     *
