@@ -19,7 +19,7 @@ import utils.Uuid.generateUuid
   *   MQTT username
   * @param password
   *   MQTT password
-  * @param topics
+  * @param subscriptions
   *   MQTT topics to subscribe to
   * @param clientId
   *   MQTT client ID
@@ -55,7 +55,7 @@ final case class MqttSettings(
     port: Int,
     username: String = "",
     password: String = "",
-    topics: Seq[MqttTopic] = Seq.empty[MqttTopic],
+    subscriptions: Seq[MqttTopic] = Seq.empty[MqttTopic],
     clientId: String = generateUuid.toString,
     sessionId: ByteString = ByteString(generateUuid.toString),
     connectFlags: ConnectFlags = ConnectFlags.CleanSession,

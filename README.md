@@ -1,4 +1,6 @@
 # Scala MQTT wrapper
+[![scala-mqtt-wrapper Scala version support](https://index.scala-lang.org/assist-iot-sripas/scala-mqtt-wrapper/scala-mqtt-wrapper/latest.svg)](https://index.scala-lang.org/assist-iot-sripas/scala-mqtt-wrapper/scala-mqtt-wrapper)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 ## About <a name = "about" />
 Scala wrapper for [the Alpakka MQTT Streaming library](https://doc.akka.io/docs/alpakka/current/mqtt-streaming.html).
