@@ -2,6 +2,7 @@ ThisBuild / scalaVersion := "2.13.10"
 ThisBuild / organization := "io.github.assist-iot-sripas"
 ThisBuild / homepage := Some(url("https://github.com/ASSIST-IoT-SRIPAS/scala-mqtt-wrapper/"))
 ThisBuild / licenses := List("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0"))
+ThisBuild / versionScheme := Some("semver-spec")
 ThisBuild / developers := List(
   Developer(
     "madpeh",
