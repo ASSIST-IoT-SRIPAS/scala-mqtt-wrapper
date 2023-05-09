@@ -2,7 +2,7 @@ package pl.waw.ibspan.scala_mqtt_wrapper
 
 import akka.Done
 import akka.NotUsed
-import akka.actor.typed.ActorSystem
+import akka.actor.ActorSystem
 import akka.stream.KillSwitches
 import akka.stream.RestartSettings
 import akka.stream.UniqueKillSwitch
@@ -44,7 +44,7 @@ class MqttClient(
     val mqttSettings: MqttSettings,
     val mqttSessionSettings: MqttSessionSettings = MqttSessionSettings(),
     val loggingSettings: Option[MqttLoggingSettings] = None,
-)(implicit system: ActorSystem[_]) {
+)(implicit system: ActorSystem) {
   // name used for logging
   val name: String = loggingSettings.fold("")(_.name)
 
@@ -185,8 +185,6 @@ class MqttClient(
     }
     Future.reduceLeft(Seq(publishMergeSinkFuture, eventBroadcastConsumerFutureDone))((_, _) =>
       Done
-    )(
-      system.executionContext
-    )
+    )(system.dispatcher)
   }
 }
