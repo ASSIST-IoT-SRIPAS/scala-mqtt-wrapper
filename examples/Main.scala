@@ -2,6 +2,7 @@ package pl.waw.ibspan.scala_mqtt_wrapper
 
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
+import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.stream.Attributes
 import akka.stream.alpakka.mqtt.streaming.Command
 import akka.stream.alpakka.mqtt.streaming.ControlPacketFlags
@@ -38,7 +39,7 @@ object Main {
       loggingSettings = Some(
         MqttLoggingSettings(name = "sourceClient", attributes = loggingAttributes)
       ),
-    )
+    )(system.toClassic)
 
     // create a source emitting messages from subscribed topics
     val source = MqttSource.source(
@@ -55,7 +56,7 @@ object Main {
       loggingSettings = Some(
         MqttLoggingSettings(name = "sinkClient", attributes = loggingAttributes)
       ),
-    )
+    )(system.toClassic)
 
     // create a sink to publish messages
     val sink = MqttSink.sink(
