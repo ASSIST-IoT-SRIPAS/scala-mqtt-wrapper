@@ -54,6 +54,11 @@ lazy val root = (project in file("."))
       "org.scalatest" %% "scalatest" % scalaTestVersion % Test,
       "com.typesafe.akka" %% "akka-actor-testkit-typed" % akkaVersion % Test,
       "org.scalatestplus" %% "scalacheck-1-16" % scalaTestPlusScalaCheck % Test,
+      // the following three dependencies are added explicitly to fix the issue
+      // with mixed versioning of Akka between "akka-actor-typed" and "akka-stream-alpakka-mqtt-streaming"
+      "com.typesafe.akka" %% "akka-protobuf-v3" % akkaVersion,
+      "com.typesafe.akka" %% "akka-stream" % akkaVersion,
+      "com.typesafe.akka" %% "akka-stream-typed" % akkaVersion,
     ),
     scalacOptions ++= Seq(
       "-encoding",
