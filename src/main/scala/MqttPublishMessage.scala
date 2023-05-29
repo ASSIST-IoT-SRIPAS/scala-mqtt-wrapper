@@ -9,11 +9,11 @@ import akka.util.ByteString
   *   payload to be published
   * @param topic
   *   topic to which the payload will be published
-  * @param publishFlags
-  *   MQTT publish flags
+  * @param flags
+  *   MQTT flags
   */
 final case class MqttPublishMessage(
     payload: ByteString,
     topic: String,
-    publishFlags: ControlPacketFlags = ControlPacketFlags.None,
+    flags: ControlPacketFlags = PublishQoSFlags.QoSAtMostOnceDelivery,
 )
