@@ -23,7 +23,8 @@ object MqttSource {
       mqttClient.publishEventBroadcastSource
         .log(
           name,
-          data => s"payload [${data.payload.utf8String}] from topic [${data.topic}]",
+          data =>
+            s"payload [${data.payload.utf8String}] from topic [${data.topic}] with flags [${data.flags}] and packet id [${data.packetId}]",
         )
         .addAttributes(settings.attributes)
     }

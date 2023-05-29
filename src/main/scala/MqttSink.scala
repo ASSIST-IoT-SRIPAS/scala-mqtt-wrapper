@@ -24,7 +24,8 @@ object MqttSink {
       Flow[MqttPublishMessage]
         .log(
           name,
-          data => s"payload [${data.payload.utf8String}] to topic [${data.topic}]",
+          data =>
+            s"payload [${data.payload.utf8String}] to topic [${data.topic}] with flags [${data.flags}]",
         )
         .addAttributes(settings.attributes)
         .to(mqttClient.publishMergeSink)

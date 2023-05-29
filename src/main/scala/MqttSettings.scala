@@ -49,6 +49,8 @@ import utils.Uuid.generateUuid
   *   consumed even if there is no external demand
   * @param publishMergeSinkPerProducerBufferSize
   *   buffer space used per producer for publish merge sink
+  * @param commandQueueBufferSize
+  *   MQTT command queue buffer size
   */
 final case class MqttSettings(
     host: String,
@@ -69,4 +71,5 @@ final case class MqttSettings(
     eventBroadcastSourceBufferSize: Int = 128,
     withEventBroadcastSourceBackpressure: Boolean = false,
     publishMergeSinkPerProducerBufferSize: Int = 32,
+    commandQueueBufferSize: Int = 128,
 )
