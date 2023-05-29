@@ -14,7 +14,7 @@ object Main {
   def main(args: Array[String]): Unit = {
     // MQTT clients require a running actor system
     implicit val system: ActorSystem[Nothing] = ActorSystem[Nothing](
-      Behaviors.setup[Nothing] { context =>
+      Behaviors.setup[Nothing] { _ =>
         Behaviors.empty
       },
       name = "scalaMqttWrapper",
@@ -33,7 +33,8 @@ object Main {
       MqttSettings(
         host = "mosquitto",
         port = 1883,
-        subscriptions = Seq(MqttTopic("input")),
+        subscriptions =
+          Seq(MqttTopic(name = "input", flags = SubscribeQoSFlags.QoSAtLeastOnceDelivery)),
       ),
       loggingSettings = Some(
         MqttLoggingSettings(name = "sourceClient", attributes = loggingAttributes)
@@ -65,11 +66,12 @@ object Main {
 
     // create a flow that converts the incoming messages to uppercase
     // and publishes them to the "output" topic
-    val uppercaseFlow = Flow[MqttReceivedMessage].map { case MqttReceivedMessage(payload, topic) =>
-      val outputPayload = ByteString(payload.utf8String.toUpperCase)
-      val outputTopic = "output"
-      val publishFlags = ControlPacketFlags.QoSAtLeastOnceDelivery | ControlPacketFlags.RETAIN
-      MqttPublishMessage(outputPayload, outputTopic, publishFlags)
+    val uppercaseFlow = Flow[MqttReceivedMessage].map {
+      case MqttReceivedMessage(payload, topic, flags, packetId) =>
+        val outputPayload = ByteString(payload.utf8String.toUpperCase)
+        val outputTopic = "output"
+        val publishFlags = PublishQoSFlags.QoSAtLeastOnceDelivery | ControlPacketFlags.RETAIN
+        MqttPublishMessage(outputPayload, outputTopic, publishFlags)
     }
 
     // run the stream
@@ -81,6 +83,8 @@ object Main {
     Source
       .single(Command[Nothing](Subscribe("test")))
       .runWith(sourceClient.commandMergeSink)
+    // or alternatively
+    // sourceClient.commandQueue.offer(Command[Nothing](Subscribe("test")))
 
     // after some time, shutdown the clients
     Thread.sleep(60000)
