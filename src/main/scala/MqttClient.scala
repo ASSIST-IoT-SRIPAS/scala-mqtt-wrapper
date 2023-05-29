@@ -4,6 +4,7 @@ import akka.Done
 import akka.NotUsed
 import akka.actor.typed.ActorSystem
 import akka.stream.KillSwitches
+import akka.stream.OverflowStrategy
 import akka.stream.RestartSettings
 import akka.stream.UniqueKillSwitch
 import akka.stream.alpakka.mqtt.streaming.Command
@@ -11,6 +12,7 @@ import akka.stream.alpakka.mqtt.streaming.Connect
 import akka.stream.alpakka.mqtt.streaming.Event
 import akka.stream.alpakka.mqtt.streaming.MqttCodec
 import akka.stream.alpakka.mqtt.streaming.MqttSessionSettings
+import akka.stream.alpakka.mqtt.streaming.PubAck
 import akka.stream.alpakka.mqtt.streaming.Publish
 import akka.stream.alpakka.mqtt.streaming.Subscribe
 import akka.stream.alpakka.mqtt.streaming.scaladsl.ActorMqttClientSession
@@ -22,6 +24,7 @@ import akka.stream.scaladsl.MergeHub
 import akka.stream.scaladsl.RestartSource
 import akka.stream.scaladsl.Sink
 import akka.stream.scaladsl.Source
+import akka.stream.scaladsl.SourceQueueWithComplete
 import akka.stream.scaladsl.Tcp
 import akka.util.ByteString
 
@@ -70,7 +73,9 @@ class MqttClient(
       )
     )
   val subscribeCommands: List[Command[Nothing]] =
-    mqttSettings.subscriptions.map(topic => Command[Nothing](Subscribe(topic.name))).toList
+    mqttSettings.subscriptions
+      .map(topic => Command[Nothing](Subscribe(Seq((topic.name, topic.flags)))))
+      .toList
   val initialCommands: List[Command[Nothing]] = connectCommand :: subscribeCommands
 
   // create a command merge sink that accepts client commands
@@ -85,6 +90,19 @@ class MqttClient(
     )
     .viaMat(KillSwitches.single)(Keep.both)
     .toMat(BroadcastHub.sink(bufferSize = mqttSettings.commandBroadcastSourceBufferSize))(Keep.both)
+    .run()
+
+  // active command queue that accepts client commands
+  val commandQueueSource: Source[Command[Nothing], SourceQueueWithComplete[Command[Nothing]]] =
+    Source
+      .queue[Command[Nothing]](mqttSettings.commandQueueBufferSize, OverflowStrategy.backpressure)
+  val commandQueue: SourceQueueWithComplete[Command[Nothing]] = loggingSettings
+    .fold(commandQueueSource)(settings =>
+      commandQueueSource
+        .log(settings.name + " : (internal) commandQueue", event => s"event [$event]")
+        .addAttributes(settings.attributes)
+    )
+    .to(commandMergeSink)
     .run()
 
   // create settings for restarting the MQTT event source
@@ -115,8 +133,16 @@ class MqttClient(
   // create event broadcast source that broadcasts the MQTT events
   // the kill switch is used to stop the MQTT session flow
   // the buffer size is not that important in case a consumer (with `Sink.ignore`) is created
+  // it handles QoS 1
+  // it does not handle QoS 2
   val (eventBroadcastSourceKillSwitch, eventBroadcastSource) = {
     restartingEventSource
+      .map {
+        case event @ Right(Event(Publish(_, _, Some(packetId), _), _)) =>
+          commandQueue.offer(Command[Nothing](PubAck(packetId)))
+          event
+        case event => event
+      }
       .viaMat(KillSwitches.single)(Keep.right)
       .toMat(BroadcastHub.sink(bufferSize = mqttSettings.eventBroadcastSourceBufferSize))(Keep.both)
       .run()
@@ -138,7 +164,7 @@ class MqttClient(
   // helper broadcast source that collects only MQTT publish events
   val publishEventBroadcastSource: Source[MqttReceivedMessage, NotUsed] = eventBroadcastSource
     .collect { case Right(Event(p: Publish, _)) =>
-      MqttReceivedMessage(p.payload, p.topicName)
+      MqttReceivedMessage(p.payload, p.topicName, p.flags, p.packetId)
     }
 
   // create a publish sink (a merge hub) that publishes messages to the MQTT broker
@@ -168,14 +194,15 @@ class MqttClient(
 
   /** Shutdown the client
     *
-    * Shutdowns command merge sink / command broadcast source, publish merge sink, and event
-    * broadcast source (along with the MQTT session)
+    * Shutdowns command queue, command merge sink / command broadcast source, publish merge sink,
+    * and event broadcast source (along with the MQTT session)
     *
     * @return
-    *   a future that completes after closing publish merge sink, and the (optional) event broadcast
-    *   consumer (if option withEventBroadcastSourceBackpressure is false)
+    *   a future that completes after closing command queue, publish merge sink, and the (optional)
+    *   event broadcast consumer (if option withEventBroadcastSourceBackpressure is false)
     */
   def shutdown(): Future[Done] = {
+    commandQueue.complete()
     commandMergeSinkKillSwitch.shutdown()
     publishMergeSinkKillSwitch.shutdown()
     eventBroadcastSourceKillSwitch.shutdown()
@@ -183,9 +210,9 @@ class MqttClient(
       case Some(future) => future
       case None         => Future.successful(Done)
     }
-    Future.reduceLeft(Seq(publishMergeSinkFuture, eventBroadcastConsumerFutureDone))((_, _) =>
-      Done
-    )(
+    Future.reduceLeft(
+      Seq(commandQueue.watchCompletion(), publishMergeSinkFuture, eventBroadcastConsumerFutureDone)
+    )((_, _) => Done)(
       system.executionContext
     )
   }
