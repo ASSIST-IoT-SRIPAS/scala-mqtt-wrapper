@@ -37,28 +37,26 @@ ThisBuild / fork := true
 
 Global / excludeLintKeys += idePackagePrefix
 
-lazy val akkaVersion = "2.6.20" // 2.7.x changes license to BSL v1.1
-lazy val akkaMqttVersion = "4.0.0" // 5.x changes license to BSL v1.1
-lazy val logbackVersion = "1.4.5"
-lazy val scalaTestVersion = "3.2.14"
-lazy val scalaTestPlusScalaCheck = "3.2.14.0"
+// the following resolver is required while pekko-connectors is in the snapshot version
+resolvers += "Apache Staging" at "https://repository.apache.org/content/groups/snapshots"
+
+lazy val pekkoVersion = "1.0.1"
+lazy val pekkoMqttVersion = "1.0.0-RC1+2-e6df4112-SNAPSHOT"
+lazy val logbackVersion = "1.4.7"
+lazy val scalaTestVersion = "3.2.15"
+lazy val scalaTestPlusScalaCheck = "3.2.15.0"
 
 lazy val root = (project in file("."))
   .settings(
     name := "scala-mqtt-wrapper",
     idePackagePrefix := Some("pl.waw.ibspan.scala_mqtt_wrapper"),
     libraryDependencies ++= Seq(
-      "com.typesafe.akka" %% "akka-actor-typed" % akkaVersion,
-      "com.lightbend.akka" %% "akka-stream-alpakka-mqtt-streaming" % akkaMqttVersion,
+      "org.apache.pekko" %% "pekko-actor-typed" % pekkoVersion,
+      "org.apache.pekko" %% "pekko-connectors-mqtt-streaming" % pekkoMqttVersion,
       "ch.qos.logback" % "logback-classic" % logbackVersion,
       "org.scalatest" %% "scalatest" % scalaTestVersion % Test,
-      "com.typesafe.akka" %% "akka-actor-testkit-typed" % akkaVersion % Test,
-      "org.scalatestplus" %% "scalacheck-1-16" % scalaTestPlusScalaCheck % Test,
-      // the following three dependencies are added explicitly to fix the issue
-      // with mixed versioning of Akka between "akka-actor-typed" and "akka-stream-alpakka-mqtt-streaming"
-      "com.typesafe.akka" %% "akka-protobuf-v3" % akkaVersion,
-      "com.typesafe.akka" %% "akka-stream" % akkaVersion,
-      "com.typesafe.akka" %% "akka-stream-typed" % akkaVersion,
+      "org.apache.pekko" %% "pekko-actor-testkit-typed" % pekkoVersion % Test,
+      "org.scalatestplus" %% "scalacheck-1-17" % scalaTestPlusScalaCheck % Test,
     ),
     scalacOptions ++= Seq(
       "-encoding",
