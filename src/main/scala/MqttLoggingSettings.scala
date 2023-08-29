@@ -1,7 +1,7 @@
 package pl.waw.ibspan.scala_mqtt_wrapper
 
-import akka.event.Logging
-import akka.stream.Attributes
+import org.apache.pekko.event.Logging
+import org.apache.pekko.stream.Attributes
 
 /** MQTT logging settings
   *

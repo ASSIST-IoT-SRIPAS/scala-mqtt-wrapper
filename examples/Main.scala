@@ -1,14 +1,14 @@
 package pl.waw.ibspan.scala_mqtt_wrapper
 
-import akka.actor.typed.ActorSystem
-import akka.actor.typed.scaladsl.Behaviors
-import akka.stream.Attributes
-import akka.stream.alpakka.mqtt.streaming.Command
-import akka.stream.alpakka.mqtt.streaming.ControlPacketFlags
-import akka.stream.alpakka.mqtt.streaming.Subscribe
-import akka.stream.scaladsl.Flow
-import akka.stream.scaladsl.Source
-import akka.util.ByteString
+import org.apache.pekko.actor.typed.ActorSystem
+import org.apache.pekko.actor.typed.scaladsl.Behaviors
+import org.apache.pekko.stream.Attributes
+import org.apache.pekko.stream.connectors.mqtt.streaming.Command
+import org.apache.pekko.stream.connectors.mqtt.streaming.ControlPacketFlags
+import org.apache.pekko.stream.connectors.mqtt.streaming.Subscribe
+import org.apache.pekko.stream.scaladsl.Flow
+import org.apache.pekko.stream.scaladsl.Source
+import org.apache.pekko.util.ByteString
 
 object Main {
   def main(args: Array[String]): Unit = {

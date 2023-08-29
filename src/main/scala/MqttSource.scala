@@ -1,7 +1,7 @@
 package pl.waw.ibspan.scala_mqtt_wrapper
 
-import akka.NotUsed
-import akka.stream.scaladsl.Source
+import org.apache.pekko.NotUsed
+import org.apache.pekko.stream.scaladsl.Source
 
 object MqttSource {
 

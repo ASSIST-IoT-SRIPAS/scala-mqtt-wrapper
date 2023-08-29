@@ -1,8 +1,8 @@
 package pl.waw.ibspan.scala_mqtt_wrapper
 
-import akka.stream.alpakka.mqtt.streaming.ControlPacketFlags
-import akka.stream.alpakka.mqtt.streaming.PacketId
-import akka.util.ByteString
+import org.apache.pekko.stream.connectors.mqtt.streaming.ControlPacketFlags
+import org.apache.pekko.stream.connectors.mqtt.streaming.PacketId
+import org.apache.pekko.util.ByteString
 
 /** data received from the MQTT broker
   * @param payload
