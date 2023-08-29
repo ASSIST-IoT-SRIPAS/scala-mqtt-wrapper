@@ -3,22 +3,19 @@ version: '3.9'
 services:
   app:
     build:
-      args:
-        - JAVA_VERSION=17.0.4-tem
-        - SBT_VERSION=1.8.0
-        - SCALA_VERSION=2.13.10
       context: ../..
       dockerfile: ./dev/app/Dockerfile
     container_name: smw-app-dev
     networks:
       - smw-app-mosquitto-net
+      - smw-app-vernemq-net
     volumes:
       - swm-app-ivy2-data:/root/.ivy2
       - swm-app-sbt-data:/root/.sbt
       - ../../src:/app/src
 
   mosquitto:
-    build: ./dev/mqtt/mosquitto
+    build: ../mqtt/mosquitto
     container_name: smw-mosquitto-dev
     networks:
       - smw-app-mosquitto-net
@@ -33,14 +30,29 @@ services:
     image: smeagolworms4/mqtt-explorer:browser-1.0.1
     networks:
       - swm-mosquitto-explorer-net
+      - swm-vernemq-explorer-net
     ports:
       - "4000:4000"
     volumes:
       - swm-mqtt-explorer-data:/mqtt-explorer/config
 
+  vernemq:
+    build: ../mqtt/vernemq
+    container_name: smw-vernemq-dev
+    environment:
+      - DOCKER_VERNEMQ_ACCEPT_EULA=yes
+      - DOCKER_VERNEMQ_ALLOW_ANONYMOUS=on
+    networks:
+      - smw-app-vernemq-net
+      - swm-vernemq-explorer-net
+    ports:
+      - "1884:1883"
+
 networks:
   smw-app-mosquitto-net:
+  smw-app-vernemq-net:
   swm-mosquitto-explorer-net:
+  swm-vernemq-explorer-net:
 
 volumes:
   swm-app-ivy2-data:
