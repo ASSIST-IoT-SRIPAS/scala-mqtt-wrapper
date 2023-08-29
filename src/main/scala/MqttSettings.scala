@@ -1,8 +1,8 @@
 package pl.waw.ibspan.scala_mqtt_wrapper
 
-import akka.event.Logging
-import akka.stream.alpakka.mqtt.streaming.ConnectFlags
-import akka.util.ByteString
+import org.apache.pekko.event.Logging
+import org.apache.pekko.stream.connectors.mqtt.streaming.ConnectFlags
+import org.apache.pekko.util.ByteString
 
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.duration.FiniteDuration

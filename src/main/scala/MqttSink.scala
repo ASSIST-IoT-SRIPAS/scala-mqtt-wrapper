@@ -1,8 +1,8 @@
 package pl.waw.ibspan.scala_mqtt_wrapper
 
-import akka.NotUsed
-import akka.stream.scaladsl.Flow
-import akka.stream.scaladsl.Sink
+import org.apache.pekko.NotUsed
+import org.apache.pekko.stream.scaladsl.Flow
+import org.apache.pekko.stream.scaladsl.Sink
 
 object MqttSink {
 

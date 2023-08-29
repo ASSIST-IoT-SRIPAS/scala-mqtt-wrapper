@@ -1,7 +1,7 @@
 package pl.waw.ibspan.scala_mqtt_wrapper
 
-import akka.stream.alpakka.mqtt.streaming.ControlPacketFlags
-import akka.util.ByteString
+import org.apache.pekko.stream.connectors.mqtt.streaming.ControlPacketFlags
+import org.apache.pekko.util.ByteString
 
 /** MQTT data to be published
   *
