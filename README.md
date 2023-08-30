@@ -4,7 +4,8 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 ## About <a name = "about" />
-Scala wrapper for [the Alpakka MQTT Streaming library](https://doc.akka.io/docs/alpakka/current/mqtt-streaming.html).
+Scala wrapper for [the Pekko Connectors MQTT Streaming library](https://pekko.apache.org/docs/pekko-connectors/current/mqtt-streaming.html).
+Historically, the wrapper was made for [the Alpakka MQTT Streaming library](https://doc.akka.io/docs/alpakka/current/mqtt-streaming.html).
 
 ## Installation <a name = "installation" />
 Add the following to your `build.sbt` file:
