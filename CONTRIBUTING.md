@@ -8,20 +8,22 @@ TODO
 TODO
 
 ## Development environment
-For development, run `app.sh` and `env.sh` scripts:
-```
+For development, run `app3.sh` (Scala 3) or `app213.sh` (Scala 2.13), and `env.sh` scripts:
+```shell
 # first terminal
 
-./dev/scripts/app.sh
+./dev/scripts/app3.sh
+or
+./dev/scripts/app213.sh
 ```
 
-```
+```shell
 # second terminal
 
 ./dev/scripts/env.sh
 ```
 
-The `app.sh` script will start the application in the development mode.
+The `app3.sh` and `app213.sh` scripts will start the application in the development mode.
 The `env.sh` script will start the development environment.
 
 ## Project structure
