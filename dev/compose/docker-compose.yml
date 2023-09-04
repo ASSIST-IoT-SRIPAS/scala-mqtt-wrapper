@@ -3,6 +3,8 @@ version: '3.9'
 services:
   app:
     build:
+      args:
+        - SCALA_VERSION=${SCALA_VERSION}
       context: ../..
       dockerfile: ./dev/app/Dockerfile
     container_name: smw-app-dev

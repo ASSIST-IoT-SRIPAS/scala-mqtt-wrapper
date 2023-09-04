@@ -1,4 +1,5 @@
-ThisBuild / scalaVersion := "2.13.10"
+ThisBuild / scalaVersion := "2.13.11"
+ThisBuild / crossScalaVersions := Seq("2.13.11", "3.3.0")
 ThisBuild / organization := "io.github.assist-iot-sripas"
 ThisBuild / homepage := Some(url("https://github.com/ASSIST-IoT-SRIPAS/scala-mqtt-wrapper/"))
 ThisBuild / licenses := List("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0"))
@@ -38,10 +39,10 @@ ThisBuild / fork := true
 Global / excludeLintKeys += idePackagePrefix
 
 // the following resolver is required while pekko-connectors is in the snapshot version
-resolvers += "Apache Staging" at "https://repository.apache.org/content/groups/snapshots"
+ThisBuild / resolvers += "Apache Staging" at "https://repository.apache.org/content/groups/snapshots"
 
 lazy val pekkoVersion = "1.0.1"
-lazy val pekkoMqttVersion = "1.0.0-RC1+2-e6df4112-SNAPSHOT"
+lazy val pekkoMqttVersion = "1.0.0-RC1+3-15eb692d-SNAPSHOT"
 lazy val logbackVersion = "1.4.7"
 lazy val scalaTestVersion = "3.2.15"
 lazy val scalaTestPlusScalaCheck = "3.2.15.0"
