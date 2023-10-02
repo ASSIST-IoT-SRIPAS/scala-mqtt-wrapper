@@ -1,8 +1,8 @@
 ARG SCALA_VERSION
 
-FROM sbtscala/scala-sbt:eclipse-temurin-jammy-17.0.5_8_1.9.4_2.13.11 AS scala-213
+FROM sbtscala/scala-sbt:eclipse-temurin-jammy-17.0.8.1_1_1.9.6_2.13.12 AS scala-213
 
-FROM sbtscala/scala-sbt:eclipse-temurin-focal-17.0.5_8_1.9.4_3.3.0 AS scala-3
+FROM sbtscala/scala-sbt:eclipse-temurin-jammy-17.0.8.1_1_1.9.6_3.3.1 AS scala-3
 
 FROM scala-${SCALA_VERSION}
 WORKDIR /app
