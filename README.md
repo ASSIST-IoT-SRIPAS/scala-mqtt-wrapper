@@ -12,7 +12,7 @@ Add the following to your `build.sbt` file:
 ```scala
 libraryDependencies += "io.github.assist-iot-sripas" %% "scala-mqtt-wrapper" % "(version)"
 ```
-Currently, the supported Scala versions are `2.13.11` and `3.3.0`.
+Currently, the supported Scala versions are `2.13.12` and `3.3.1`.
 
 ## Examples <a name = "examples" />
 
