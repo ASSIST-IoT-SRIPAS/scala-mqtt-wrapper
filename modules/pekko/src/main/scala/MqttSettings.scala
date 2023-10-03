@@ -1,13 +1,12 @@
-package pl.waw.ibspan.scala_mqtt_wrapper
+package pl.waw.ibspan.scala_mqtt_wrapper.pekko
 
 import org.apache.pekko.event.Logging
 import org.apache.pekko.stream.connectors.mqtt.streaming.ConnectFlags
 import org.apache.pekko.util.ByteString
+import pl.waw.ibspan.scala_mqtt_wrapper.utils.Uuid.generateUuid
 
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.duration.FiniteDuration
-
-import utils.Uuid.generateUuid
 
 /** MQTT client settings
   *

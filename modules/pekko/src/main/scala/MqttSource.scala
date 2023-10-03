@@ -1,4 +1,4 @@
-package pl.waw.ibspan.scala_mqtt_wrapper
+package pl.waw.ibspan.scala_mqtt_wrapper.pekko
 
 import org.apache.pekko.NotUsed
 import org.apache.pekko.stream.scaladsl.Source
