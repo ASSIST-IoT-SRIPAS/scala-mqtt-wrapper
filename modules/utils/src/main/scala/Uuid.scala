@@ -1,5 +1,4 @@
-package pl.waw.ibspan.scala_mqtt_wrapper
-package utils
+package pl.waw.ibspan.scala_mqtt_wrapper.utils
 
 import java.util.UUID
 
