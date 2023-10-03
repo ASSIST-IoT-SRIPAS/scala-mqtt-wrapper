@@ -27,6 +27,4 @@ project/metals.sbt
 *.semanticdb
 slim.report.json
 
-src/main/scala/Main.scala
-
 .sdkmanrc

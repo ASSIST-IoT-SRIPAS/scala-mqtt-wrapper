@@ -8,23 +8,27 @@ TODO
 TODO
 
 ## Development environment
-For development, run `app3.sh` (Scala 3) or `app213.sh` (Scala 2.13), and `env.sh` scripts:
+For development, run `app3.sh` (Scala 3) or `app213.sh` (Scala 2.13), and `env.sh` scripts.
+
+### Application
+The `app3.sh` and `app213.sh` scripts will start the application in the development mode.
 ```shell
 # first terminal
 
-./dev/scripts/app3.sh
+./dev/scripts/pekko/app3.sh
 or
-./dev/scripts/app213.sh
+./dev/scripts/pekko/app213.sh
+or
+./dev/scripts/akka/app213.sh
 ```
 
+### Environment
+The `env.sh` script will start the development environment.
 ```shell
 # second terminal
 
 ./dev/scripts/env.sh
 ```
-
-The `app3.sh` and `app213.sh` scripts will start the application in the development mode.
-The `env.sh` script will start the development environment.
 
 ## Project structure
 TODO
@@ -34,12 +38,9 @@ TODO
 
 ## Releases
 Commits to main will trigger a SNAPSHOT release.
-
-To create a full release, create a tag on the main branch like so:
-
+To create a full release, create a tag on the main branch.
 ```shell
 git tag -a v0.1.0 -m "v0.1.0"
 git push origin v0.1.0
 ```
-
 The releases should be pushed to Maven Central.

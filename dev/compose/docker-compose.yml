@@ -4,6 +4,7 @@ services:
   app:
     build:
       args:
+        - LIBRARY_VERSION=${LIBRARY_VERSION}
         - SCALA_VERSION=${SCALA_VERSION}
       context: ../..
       dockerfile: ./dev/app/Dockerfile
@@ -14,7 +15,7 @@ services:
     volumes:
       - swm-app-ivy2-data:/root/.ivy2
       - swm-app-sbt-data:/root/.sbt
-      - ../../src:/app/src
+      - ../../modules:/app/modules
 
   mosquitto:
     build: ../mqtt/mosquitto
