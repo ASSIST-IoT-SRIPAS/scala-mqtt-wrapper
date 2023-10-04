@@ -67,10 +67,9 @@ lazy val commonDependencies = Seq(
 lazy val utils = (project in file("modules/utils"))
   .settings(
     commonSettings,
-    name := "utils",
+    name := "scala-mqtt-wrapper-utils",
     idePackagePrefix := Some("pl.waw.ibspan.scala_mqtt_wrapper.utils"),
     libraryDependencies ++= commonDependencies,
-    publish / skip := true,
   )
 
 lazy val pekkoVersion = "1.0.1"
