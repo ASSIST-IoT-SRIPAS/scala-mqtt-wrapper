@@ -1,3 +1,5 @@
+package pl.waw.ibspan.scala_mqtt_wrapper.pekko
+
 import org.apache.pekko.actor.typed.ActorSystem
 import org.apache.pekko.actor.typed.scaladsl.Behaviors
 import org.apache.pekko.stream.Attributes

@@ -87,12 +87,6 @@ lazy val pekko = (project in file("modules/pekko"))
       "org.apache.pekko" %% "pekko-connectors-mqtt-streaming" % pekkoMqttVersion,
       "org.apache.pekko" %% "pekko-actor-testkit-typed" % pekkoVersion % Test,
     ),
-    Compile / unmanagedSourceDirectories += baseDirectory.value / "src" / "dev" / "scala",
-    Compile / packageBin / mappings ~= { (ms: Seq[(java.io.File, String)]) =>
-      ms.filterNot { case (file, toPath) =>
-        file.getAbsolutePath.contains("/src/dev/scala/")
-      }
-    },
   )
   .dependsOn(utils)
   .aggregate(utils)
@@ -116,12 +110,6 @@ lazy val akka = (project in file("modules/akka"))
       "com.typesafe.akka" %% "akka-stream" % akkaVersion,
       "com.typesafe.akka" %% "akka-stream-typed" % akkaVersion,
     ),
-    Compile / unmanagedSourceDirectories += baseDirectory.value / "src" / "dev" / "scala",
-    Compile / packageBin / mappings ~= { (ms: Seq[(java.io.File, String)]) =>
-      ms.filterNot { case (file, toPath) =>
-        file.getAbsolutePath.contains("/src/dev/scala/")
-      }
-    },
   )
   .dependsOn(utils)
   .aggregate(utils)

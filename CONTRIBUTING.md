@@ -11,6 +11,7 @@ TODO
 For development, run `app3.sh` (Scala 3) or `app213.sh` (Scala 2.13), and `env.sh` scripts.
 
 ### Application
+Copy a file from examples to a directory with pekko or akka module, and name it `Main.scala` (i.e., `modules/pekko/src/main/scala/Main.scala`).
 The `app3.sh` and `app213.sh` scripts will start the application in the development mode.
 ```shell
 # first terminal
