@@ -29,5 +29,4 @@ slim.report.json
 
 .sdkmanrc
 
-modules/pekko/src/main/scala/Main.scala
-modules/akka/src/main/scala/Main.scala
+modules/**/Main.scala
