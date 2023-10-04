@@ -1,3 +1,5 @@
+package pl.waw.ibspan.scala_mqtt_wrapper.akka
+
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
 import akka.stream.Attributes
