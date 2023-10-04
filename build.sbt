@@ -69,6 +69,7 @@ lazy val utils = (project in file("modules/utils"))
     commonSettings,
     name := "scala-mqtt-wrapper-utils",
     idePackagePrefix := Some("pl.waw.ibspan.scala_mqtt_wrapper.utils"),
+    crossScalaVersions := Seq(scala213, scala3),
     libraryDependencies ++= commonDependencies,
   )
 
