@@ -87,11 +87,6 @@ lazy val pekko = (project in file("modules/pekko"))
       "org.apache.pekko" %% "pekko-connectors-mqtt-streaming" % pekkoMqttVersion,
       "org.apache.pekko" %% "pekko-actor-testkit-typed" % pekkoVersion % Test,
     ),
-    mappings in (Compile, packageBin) := {
-      (mappings in (Compile, packageBin)).value.filter { case (file, toPath) =>
-        !toPath.endsWith("Main.class")
-      }
-    },
   )
   .dependsOn(utils)
   .aggregate(utils)
