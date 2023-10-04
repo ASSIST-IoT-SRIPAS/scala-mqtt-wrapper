@@ -78,7 +78,7 @@ lazy val pekkoMqttVersion = "1.0.0"
 lazy val pekko = (project in file("modules/pekko"))
   .settings(
     commonSettings,
-    name := "pekko-mqtt-wrapper",
+    name := "scala-mqtt-wrapper-pekko",
     idePackagePrefix := Some("pl.waw.ibspan.scala_mqtt_wrapper.pekko"),
     crossScalaVersions := Seq(scala213, scala3),
     libraryDependencies ++= commonDependencies ++ Seq(
@@ -97,7 +97,7 @@ lazy val akkaMqttVersion = "4.0.0" // 5.x changes license to BSL v1.1
 lazy val akka = (project in file("modules/akka"))
   .settings(
     commonSettings,
-    name := "akka-mqtt-wrapper",
+    name := "scala-mqtt-wrapper-akka",
     idePackagePrefix := Some("pl.waw.ibspan.scala_mqtt_wrapper.akka"),
     crossScalaVersions := Seq(scala213),
     libraryDependencies ++= commonDependencies ++ Seq(
