@@ -11,13 +11,13 @@ Add the following to your `build.sbt` file.
 
 ### Pekko
 ```scala
-libraryDependencies += "io.github.assist-iot-sripas" %% "pekko-mqtt-wrapper" % "(version)"
+libraryDependencies += "io.github.assist-iot-sripas" %% "scala-mqtt-wrapper-pekko" % "(version)"
 ```
 Currently, the supported Scala versions are `2.13.12` and `3.3.1`.
 
 ### Akka
 ```scala
-libraryDependencies += "io.github.assist-iot-sripas" %% "akka-mqtt-wrapper" % "(version)"
+libraryDependencies += "io.github.assist-iot-sripas" %% "scala-mqtt-wrapper-akka" % "(version)"
 ```
 Currently, the supported Scala version is `2.13.12`.
 
