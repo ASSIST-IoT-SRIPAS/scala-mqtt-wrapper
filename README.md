@@ -1,6 +1,4 @@
 # Scala MQTT wrapper
-[![scala-mqtt-wrapper Scala version support](https://index.scala-lang.org/assist-iot-sripas/scala-mqtt-wrapper/scala-mqtt-wrapper/latest.svg)](https://index.scala-lang.org/assist-iot-sripas/scala-mqtt-wrapper/scala-mqtt-wrapper)
-[![javadoc](https://javadoc.io/badge2/io.github.assist-iot-sripas/scala-mqtt-wrapper_2.13/javadoc.svg)](https://www.javadoc.io/doc/io.github.assist-iot-sripas/scala-mqtt-wrapper_2.13/latest/pl/waw/ibspan/scala_mqtt_wrapper/index.html)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 ## About <a name = "about" />
